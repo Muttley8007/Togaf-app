@@ -1,20 +1,19 @@
 <!-- 
 ========================================
 TOGAF LESSON TOOL
-Version: v0.2
+Version: v0.3
 Date: 2026-03-23
 
 CHANGE LOG:
-- Added multiple lesson cards
-- Added next / previous navigation
-- Added card counter
-- Added data-driven lesson structure
-- Kept expandable lesson sections
+- Added lesson overview screen
+- Can open any card directly
+- Hybrid navigation (overview + next/prev)
+- Improved flow toward real app feel
 
 NEXT:
-- Add lesson overview card list
 - Add quiz
 - Add summary page
+- Improve UI spacing
 ========================================
 -->
 
@@ -25,12 +24,10 @@ NEXT:
 <title>TOGAF Lesson Tool</title>
 
 <style>
-/* ===== GLOBAL STYLES ===== */
 body {
   font-family: Arial, sans-serif;
   margin: 0;
   background: #f4f4f4;
-  color: #222;
 }
 
 .container {
@@ -46,60 +43,23 @@ body {
   margin-bottom: 12px;
 }
 
-h2, h3 {
-  margin-top: 0;
-}
-
 button {
-  padding: 10px 14px;
+  padding: 10px;
   margin: 5px;
   border-radius: 8px;
   border: none;
   cursor: pointer;
 }
 
-/* ===== BUTTON STYLES ===== */
-.primary {
-  background: black;
-  color: white;
-}
+.primary { background: black; color: white; }
+.secondary { background: #ddd; }
 
-.secondary {
-  background: #ddd;
-  color: #222;
-}
+.section { margin-top: 15px; }
+.box { background: #eef3ff; padding: 10px; border-radius: 8px; }
+.takeaway { background: #e6f7ea; padding: 10px; border-radius: 8px; }
 
-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-/* ===== SECTION STYLES ===== */
-.section {
-  margin-top: 15px;
-}
-
-.box {
-  background: #f0f3ff;
-  padding: 10px;
-  border-radius: 8px;
-}
-
-.takeaway {
-  background: #e8f6ea;
-  padding: 10px;
-  border-radius: 8px;
-}
-
-.meta {
-  color: #666;
-  font-size: 14px;
-  margin-bottom: 10px;
-}
-
-.hidden {
-  display: none;
-}
+.hidden { display: none; }
+.meta { font-size: 14px; color: #666; }
 </style>
 </head>
 
@@ -107,222 +67,171 @@ button:disabled {
 
 <div class="container">
 
-<!-- ===== HOME SCREEN ===== -->
+<!-- HOME -->
 <div id="home">
   <div class="card">
     <h2>Lesson 1 - TOGAF Foundations</h2>
-    <p>Understand what TOGAF is, enterprise architecture, the architecture domains, the ADM, and requirements management.</p>
-    <button class="primary" onclick="startLesson()">Start Lesson</button>
+    <p>Understand TOGAF, architecture domains, ADM and requirements.</p>
+    <button class="primary" onclick="showOverview()">Start Lesson</button>
   </div>
 </div>
 
-<!-- ===== LESSON SCREEN ===== -->
+<!-- OVERVIEW -->
+<div id="overview" class="hidden"></div>
+
+<!-- LESSON -->
 <div id="lesson" class="hidden"></div>
 
 </div>
 
 <script>
 
-/*
-========================================
-LESSON DATA
-========================================
-*/
+/* ===== LESSON DATA ===== */
 const lessonCards = [
-  {
-    title: "What is TOGAF?",
-    summary: "A framework for guiding enterprise architecture decisions.",
-    concept: "TOGAF is a structured framework used by organisations to design, plan, and manage change. It connects business goals with data, applications, and technology so everything works together.",
-    why: "Without structure, organisations make disconnected decisions. TOGAF helps align everything so changes don’t conflict.",
-    analogy: "TOGAF is like a city blueprint. Instead of building randomly, everything is planned so roads, buildings, and utilities connect.",
-    detail: "TOGAF provides not just definitions but a full method, governance guidance, and structure for architecture work. It helps organisations manage complexity across multiple teams.",
-    example: "If a company upgrades systems without coordination, things break. TOGAF helps ensure business, apps, and infrastructure all align.",
-    exam: [
-      "TOGAF = enterprise architecture framework",
-      "Not a project method"
-    ],
-    takeaway: "TOGAF aligns business and IT change."
-  },
-  {
-    title: "What is Enterprise Architecture?",
-    summary: "A blueprint of how an organisation operates and evolves.",
-    concept: "Enterprise architecture describes the structure of an organisation across its business processes, data, systems, and technology. It helps define current state, future state, and the path between them.",
-    why: "It gives decision-makers a whole-of-organisation view instead of isolated choices. That reduces duplication and improves alignment.",
-    analogy: "Enterprise architecture is like the map of an entire city. It shows how roads, utilities, services, and districts fit together.",
-    detail: "Enterprise architecture is about understanding the enterprise as a connected system. It considers the relationships between strategy, operations, information, applications, and infrastructure.",
-    example: "If a department wants a new application, enterprise architecture helps assess whether it fits the wider business, existing systems, and target future state.",
-    exam: [
-      "Enterprise architecture links strategy and execution",
-      "It is broader than technology alone"
-    ],
-    takeaway: "Enterprise architecture connects business strategy with systems and technology."
-  },
-  {
-    title: "The Four Architecture Domains",
-    summary: "The main areas TOGAF uses to organise architecture thinking.",
-    concept: "TOGAF groups architecture into Business, Data, Application, and Technology domains. Each one provides a different perspective on how the organisation works and what supports it.",
-    why: "Breaking architecture into domains makes complexity easier to manage and helps ensure change is considered across the whole organisation.",
-    analogy: "The four domains are like layers of a city: business is what the city does, data is the information flowing through it, applications are the services people use, and technology is the infrastructure underneath.",
-    detail: "Business Architecture covers capabilities and processes. Data Architecture covers information structure and governance. Application Architecture covers systems and interactions. Technology Architecture covers platforms and infrastructure.",
-    example: "A customer service uplift might affect business processes, customer data, support applications, and the underlying cloud or on-prem infrastructure.",
-    exam: [
-      "The four domains are Business, Data, Application, and Technology",
-      "Security is important but not one of the four core domains"
-    ],
-    takeaway: "TOGAF organises architecture into Business, Data, Application, and Technology domains."
-  },
-  {
-    title: "The ADM",
-    summary: "TOGAF’s core method for developing architecture.",
-    concept: "The Architecture Development Method is the central method in TOGAF. It provides a repeatable cycle for moving from vision through architecture development, planning, implementation support, and change.",
-    why: "It gives architects a consistent way to approach architecture work instead of reinventing the process every time.",
-    analogy: "The ADM is like a city planning cycle: set the vision, design the layout, build what is needed, review how it works, and improve it as the city changes.",
-    detail: "The ADM is iterative rather than strictly linear. It supports the ongoing development and refinement of architecture as business needs evolve.",
-    example: "An organisation modernising legacy systems can use the ADM to move from architecture vision into business, information systems, and technology planning in a structured way.",
-    exam: [
-      "ADM = Architecture Development Method",
-      "It is iterative and repeatable"
-    ],
-    takeaway: "The ADM is a repeatable cycle used to design and manage enterprise architecture."
-  },
-  {
-    title: "Requirements Management",
-    summary: "Requirements are continuously managed across the ADM.",
-    concept: "In TOGAF, requirements are not captured once and forgotten. They are reviewed, refined, and managed throughout the architecture effort to keep the work aligned with business needs.",
-    why: "Requirements change over time. If they are not managed continuously, the architecture can drift away from what the organisation actually needs.",
-    analogy: "Requirements management is like continuously updating a city plan when traffic, population, or services change. The plan must evolve as needs evolve.",
-    detail: "Requirements management interacts with all phases of the ADM. It helps keep architecture decisions traceable and aligned with stakeholder expectations.",
-    example: "If new regulatory needs appear mid-program, requirements management ensures those changes are reflected in architecture decisions instead of being missed.",
-    exam: [
-      "Requirements management is continuous",
-      "It supports every phase of the ADM"
-    ],
-    takeaway: "Requirements in TOGAF are continuously managed across all phases of the ADM."
-  }
+  { title:"What is TOGAF?", summary:"Framework for architecture decisions",
+    concept:"TOGAF aligns business and IT change.",
+    why:"Prevents disconnected decisions.",
+    analogy:"Like a city blueprint.",
+    detail:"Provides method, governance and structure.",
+    example:"Without TOGAF, systems conflict.",
+    exam:["Framework not project method"],
+    takeaway:"Aligns business and IT." },
+
+  { title:"Enterprise Architecture", summary:"Blueprint of organisation",
+    concept:"Defines structure across business and tech.",
+    why:"Gives whole view.",
+    analogy:"Like a city map.",
+    detail:"Links strategy to execution.",
+    example:"Ensures systems align with goals.",
+    exam:["Links strategy to systems"],
+    takeaway:"Connects strategy to systems." },
+
+  { title:"Architecture Domains", summary:"4 core areas",
+    concept:"Business, Data, Application, Technology.",
+    why:"Simplifies complexity.",
+    analogy:"City layers.",
+    detail:"Each domain has role.",
+    example:"Changes affect all layers.",
+    exam:["Know all 4 domains"],
+    takeaway:"4 domains structure architecture." }
 ];
 
-/*
-========================================
-STATE MANAGEMENT
-========================================
-*/
+/* ===== STATE ===== */
 let currentCard = 0;
 
-/*
-========================================
-NAVIGATION FUNCTIONS
-========================================
-*/
-function startLesson() {
-  currentCard = 0;
-  document.getElementById("home").classList.add("hidden");
-  document.getElementById("lesson").classList.remove("hidden");
-  renderLesson();
+/* ===== NAVIGATION ===== */
+function showOverview() {
+  hideAll();
+  document.getElementById("overview").classList.remove("hidden");
+
+  let html = `<h3>Lesson Cards</h3>`;
+
+  lessonCards.forEach((c, i) => {
+    html += `
+      <div class="card">
+        <h4>${c.title}</h4>
+        <p>${c.summary}</p>
+        <button class="primary" onclick="openCard(${i})">Open</button>
+      </div>
+    `;
+  });
+
+  document.getElementById("overview").innerHTML = html;
 }
 
-function goHome() {
-  document.getElementById("lesson").classList.add("hidden");
-  document.getElementById("home").classList.remove("hidden");
+function openCard(index) {
+  currentCard = index;
+  hideAll();
+  document.getElementById("lesson").classList.remove("hidden");
+  renderCard();
 }
 
 function nextCard() {
   if (currentCard < lessonCards.length - 1) {
     currentCard++;
-    renderLesson();
+    renderCard();
   }
 }
 
 function prevCard() {
   if (currentCard > 0) {
     currentCard--;
-    renderLesson();
+    renderCard();
   }
 }
 
-/*
-========================================
-RENDER FUNCTIONS
-========================================
-*/
-function renderLesson() {
-  const card = lessonCards[currentCard];
+function goOverview() {
+  showOverview();
+}
+
+/* ===== RENDER ===== */
+function renderCard() {
+  const c = lessonCards[currentCard];
 
   document.getElementById("lesson").innerHTML = `
     <div class="card">
 
-      <div class="meta">Card ${currentCard + 1} of ${lessonCards.length}</div>
+      <div class="meta">Card ${currentCard+1} of ${lessonCards.length}</div>
 
-      <h2>${card.title}</h2>
-      <p><b>${card.summary}</b></p>
+      <h2>${c.title}</h2>
+      <p><b>${c.summary}</b></p>
 
-      <!-- ===== CONCEPT ===== -->
       <div class="section">
         <h3>Concept</h3>
-        <p>${card.concept}</p>
+        <p>${c.concept}</p>
       </div>
 
-      <!-- ===== WHY IT MATTERS ===== -->
       <div class="section">
         <h3>Why it matters</h3>
-        <p>${card.why}</p>
+        <p>${c.why}</p>
       </div>
 
-      <!-- ===== ANALOGY ===== -->
       <div class="section box">
         <h3>Analogy</h3>
-        <p>${card.analogy}</p>
+        <p>${c.analogy}</p>
       </div>
 
-      <!-- ===== DETAILED EXPLANATION ===== -->
       <div class="section">
-        <button class="secondary" onclick="toggle('detail')">Show Detailed Explanation</button>
-        <div id="detail" class="hidden">
-          <p>${card.detail}</p>
-        </div>
+        <button onclick="toggle('d')">Detail</button>
+        <div id="d" class="hidden">${c.detail}</div>
       </div>
 
-      <!-- ===== PRACTICAL EXAMPLE ===== -->
       <div class="section">
-        <button class="secondary" onclick="toggle('example')">Show Example</button>
-        <div id="example" class="hidden">
-          <p>${card.example}</p>
-        </div>
+        <button onclick="toggle('e')">Example</button>
+        <div id="e" class="hidden">${c.example}</div>
       </div>
 
-      <!-- ===== EXAM NOTES ===== -->
       <div class="section">
-        <button class="secondary" onclick="toggle('exam')">Show Exam Notes</button>
-        <div id="exam" class="hidden">
-          ${card.exam.map(note => `<p>${note}</p>`).join("")}
-        </div>
+        <button onclick="toggle('x')">Exam Notes</button>
+        <div id="x" class="hidden">${c.exam.map(n=>`<p>${n}</p>`).join("")}</div>
       </div>
 
-      <!-- ===== KEY TAKEAWAY ===== -->
       <div class="section takeaway">
-        <h3>Key Takeaway</h3>
-        <p>${card.takeaway}</p>
+        <h3>Takeaway</h3>
+        <p>${c.takeaway}</p>
       </div>
 
-      <!-- ===== NAVIGATION ===== -->
       <div class="section">
-        <button class="secondary" onclick="goHome()">Back</button>
-        <button class="secondary" onclick="prevCard()" ${currentCard === 0 ? "disabled" : ""}>Previous</button>
-        <button class="primary" onclick="nextCard()" ${currentCard === lessonCards.length - 1 ? "disabled" : ""}>Next</button>
+        <button onclick="goOverview()">Back</button>
+        <button onclick="prevCard()" ${currentCard===0?"disabled":""}>Prev</button>
+        <button class="primary" onclick="nextCard()" ${currentCard===lessonCards.length-1?"disabled":""}>Next</button>
       </div>
 
     </div>
   `;
 }
 
-/*
-========================================
-UTILITY FUNCTIONS
-========================================
-*/
-function toggle(id) {
-  let el = document.getElementById(id);
-  el.classList.toggle("hidden");
+/* ===== UTIL ===== */
+function toggle(id){
+  document.getElementById(id).classList.toggle("hidden");
 }
+
+function hideAll(){
+  document.getElementById("home").classList.add("hidden");
+  document.getElementById("overview").classList.add("hidden");
+  document.getElementById("lesson").classList.add("hidden");
+}
+
 </script>
 
 </body>
