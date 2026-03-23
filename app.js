@@ -86,54 +86,75 @@ function renderCard() {
   lesson.innerHTML = `
     <div class="card">
       <div class="meta">Card ${currentCard + 1} of ${activeLesson.cards.length}</div>
+
       <h2>${card.title}</h2>
-      <p><b>${card.summary}</b></p>
+      <p><b>${card.summary || ""}</b></p>
 
       <div class="section">
         <h3>Concept</h3>
-        <p>${card.concept}</p>
+        <p>${card.concept || ""}</p>
       </div>
 
       <div class="section">
         <h3>Why it matters</h3>
-        <p>${card.why}</p>
+        <p>${card.why || ""}</p>
       </div>
 
       <div class="section box">
         <h3>Analogy</h3>
-        <p>${card.analogy}</p>
+        <p>${card.analogy || ""}</p>
       </div>
 
+      ${
+        card.detail
+          ? `
       <div class="section">
         <button class="secondary" onclick="toggle('detail')">Show Detailed Explanation</button>
         <div id="detail" class="hidden">
           <p>${card.detail}</p>
         </div>
       </div>
+      `
+          : ""
+      }
 
+      ${
+        card.example
+          ? `
       <div class="section">
         <button class="secondary" onclick="toggle('example')">Show Example</button>
         <div id="example" class="hidden">
           <p>${card.example}</p>
         </div>
       </div>
+      `
+          : ""
+      }
 
+      ${
+        card.exam
+          ? `
       <div class="section">
         <button class="secondary" onclick="toggle('exam')">Show Exam Notes</button>
         <div id="exam" class="hidden">
           ${card.exam.map(note => `<p>${note}</p>`).join("")}
         </div>
       </div>
+      `
+          : ""
+      }
 
       <div class="section takeaway">
         <h3>Key Takeaway</h3>
-        <p>${card.takeaway}</p>
+        <p>${card.takeaway || ""}</p>
       </div>
 
       <div class="section">
         <button class="secondary" onclick="showOverview()">Back</button>
         <button class="secondary" onclick="prevCard()" ${currentCard === 0 ? "disabled" : ""}>Previous</button>
-        <button class="primary" onclick="nextCard()">${currentCard === activeLesson.cards.length - 1 ? "Start Quiz" : "Next"}</button>
+        <button class="primary" onclick="nextCard()">
+          ${currentCard === activeLesson.cards.length - 1 ? "Start Quiz" : "Next"}
+        </button>
       </div>
     </div>
   `;
