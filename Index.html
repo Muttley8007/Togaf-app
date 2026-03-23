@@ -1,1 +1,176 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOGAF Lesson Tool</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #f5f5f5;
+  color: #222;
+}
+
+.container {
+  max-width: 800px;
+  margin: auto;
+  padding: 16px;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 12px;
+}
+
+button {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: none;
+  margin: 4px;
+  cursor: pointer;
+}
+
+.primary { background: black; color: white; }
+.secondary { background: #ddd; }
+
+.analogy {
+  background: #eef3ff;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.takeaway {
+  background: #e6f7ea;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.hidden { display: none; }
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div id="overview">
+  <h2>Lesson 1 – TOGAF Foundations</h2>
+  <p>Understand TOGAF, enterprise architecture, domains, ADM, and requirements.</p>
+  <button class="primary" onclick="startLesson()">Start Lesson</button>
+  <button onclick="showQuiz()">Quiz</button>
+  <button onclick="showSummary()">Summary</button>
+</div>
+
+<div id="lesson" class="hidden"></div>
+
+<div id="quiz" class="hidden"></div>
+
+<div id="summary" class="hidden"></div>
+
+</div>
+
+<script>
+
+const cards = [
+{
+title: "What is TOGAF?",
+summary: "Framework for guiding enterprise architecture",
+concept: "TOGAF helps organisations plan and manage change by aligning business with technology.",
+why: "Without it, systems become disconnected.",
+analogy: "Like a city blueprint ensuring roads and buildings connect.",
+takeaway: "TOGAF aligns business and IT change."
+},
+{
+title: "Enterprise Architecture",
+summary: "Blueprint of organisation",
+concept: "Describes business, systems, and technology.",
+why: "Helps avoid isolated decisions.",
+analogy: "Like a map of a city.",
+takeaway: "Connects strategy with systems."
+}
+];
+
+let current = 0;
+
+function startLesson() {
+  document.getElementById("overview").classList.add("hidden");
+  document.getElementById("lesson").classList.remove("hidden");
+  renderCard();
+}
+
+function renderCard() {
+  const c = cards[current];
+  document.getElementById("lesson").innerHTML = `
+    <div class="card">
+      <h3>${c.title}</h3>
+      <p><b>${c.summary}</b></p>
+      <p>${c.concept}</p>
+      <p><b>Why it matters:</b> ${c.why}</p>
+      <div class="analogy"><b>Analogy:</b> ${c.analogy}</div>
+      <div class="takeaway"><b>Takeaway:</b> ${c.takeaway}</div>
+
+      <button onclick="prev()">Prev</button>
+      <button class="primary" onclick="next()">Next</button>
+    </div>
+  `;
+}
+
+function next() {
+  if (current < cards.length - 1) {
+    current++;
+    renderCard();
+  } else {
+    showQuiz();
+  }
+}
+
+function prev() {
+  if (current > 0) {
+    current--;
+    renderCard();
+  }
+}
+
+function showQuiz() {
+  document.getElementById("lesson").classList.add("hidden");
+  document.getElementById("quiz").classList.remove("hidden");
+
+  document.getElementById("quiz").innerHTML = `
+    <div class="card">
+      <h3>Quick Quiz</h3>
+      <p>What does TOGAF stand for?</p>
+      <button onclick="answer(true)">The Open Group Architecture Framework</button>
+      <button onclick="answer(false)">Something else</button>
+    </div>
+  `;
+}
+
+function answer(correct) {
+  alert(correct ? "Correct!" : "Try again");
+}
+
+function showSummary() {
+  document.getElementById("overview").classList.add("hidden");
+  document.getElementById("quiz").classList.add("hidden");
+  document.getElementById("summary").classList.remove("hidden");
+
+  document.getElementById("summary").innerHTML = `
+    <div class="card">
+      <h3>What you should know</h3>
+      <ul>
+        <li>TOGAF is a framework</li>
+        <li>Enterprise architecture links business and IT</li>
+      </ul>
+    </div>
+  `;
+}
+
+</script>
+
+</body>
+</html>
