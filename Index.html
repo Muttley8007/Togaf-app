@@ -1,19 +1,20 @@
 <!-- 
 ========================================
 TOGAF LESSON TOOL
-Version: v0.1
+Version: v0.2
 Date: 2026-03-23
 
 CHANGE LOG:
-- Initial working concept
-- Single lesson (What is TOGAF)
-- Expandable sections (detail, example, exam notes)
-- Basic navigation (home ↔ lesson)
+- Added multiple lesson cards
+- Added next / previous navigation
+- Added card counter
+- Added data-driven lesson structure
+- Kept expandable lesson sections
 
 NEXT:
-- Add multiple cards
-- Add card navigation (next/prev)
+- Add lesson overview card list
 - Add quiz
+- Add summary page
 ========================================
 -->
 
@@ -29,6 +30,7 @@ body {
   font-family: Arial, sans-serif;
   margin: 0;
   background: #f4f4f4;
+  color: #222;
 }
 
 .container {
@@ -49,16 +51,27 @@ h2, h3 {
 }
 
 button {
-  padding: 10px;
+  padding: 10px 14px;
   margin: 5px;
   border-radius: 8px;
   border: none;
+  cursor: pointer;
 }
 
 /* ===== BUTTON STYLES ===== */
 .primary {
   background: black;
   color: white;
+}
+
+.secondary {
+  background: #ddd;
+  color: #222;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
 /* ===== SECTION STYLES ===== */
@@ -70,6 +83,18 @@ button {
   background: #f0f3ff;
   padding: 10px;
   border-radius: 8px;
+}
+
+.takeaway {
+  background: #e8f6ea;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.meta {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 10px;
 }
 
 .hidden {
@@ -84,9 +109,11 @@ button {
 
 <!-- ===== HOME SCREEN ===== -->
 <div id="home">
-  <h2>Lesson 1 - TOGAF Foundations</h2>
-  <p>Understand what TOGAF is and how it works.</p>
-  <button class="primary" onclick="startLesson()">Start Lesson</button>
+  <div class="card">
+    <h2>Lesson 1 - TOGAF Foundations</h2>
+    <p>Understand what TOGAF is, enterprise architecture, the architecture domains, the ADM, and requirements management.</p>
+    <button class="primary" onclick="startLesson()">Start Lesson</button>
+  </div>
 </div>
 
 <!-- ===== LESSON SCREEN ===== -->
@@ -96,7 +123,85 @@ button {
 
 <script>
 
-/* 
+/*
+========================================
+LESSON DATA
+========================================
+*/
+const lessonCards = [
+  {
+    title: "What is TOGAF?",
+    summary: "A framework for guiding enterprise architecture decisions.",
+    concept: "TOGAF is a structured framework used by organisations to design, plan, and manage change. It connects business goals with data, applications, and technology so everything works together.",
+    why: "Without structure, organisations make disconnected decisions. TOGAF helps align everything so changes don’t conflict.",
+    analogy: "TOGAF is like a city blueprint. Instead of building randomly, everything is planned so roads, buildings, and utilities connect.",
+    detail: "TOGAF provides not just definitions but a full method, governance guidance, and structure for architecture work. It helps organisations manage complexity across multiple teams.",
+    example: "If a company upgrades systems without coordination, things break. TOGAF helps ensure business, apps, and infrastructure all align.",
+    exam: [
+      "TOGAF = enterprise architecture framework",
+      "Not a project method"
+    ],
+    takeaway: "TOGAF aligns business and IT change."
+  },
+  {
+    title: "What is Enterprise Architecture?",
+    summary: "A blueprint of how an organisation operates and evolves.",
+    concept: "Enterprise architecture describes the structure of an organisation across its business processes, data, systems, and technology. It helps define current state, future state, and the path between them.",
+    why: "It gives decision-makers a whole-of-organisation view instead of isolated choices. That reduces duplication and improves alignment.",
+    analogy: "Enterprise architecture is like the map of an entire city. It shows how roads, utilities, services, and districts fit together.",
+    detail: "Enterprise architecture is about understanding the enterprise as a connected system. It considers the relationships between strategy, operations, information, applications, and infrastructure.",
+    example: "If a department wants a new application, enterprise architecture helps assess whether it fits the wider business, existing systems, and target future state.",
+    exam: [
+      "Enterprise architecture links strategy and execution",
+      "It is broader than technology alone"
+    ],
+    takeaway: "Enterprise architecture connects business strategy with systems and technology."
+  },
+  {
+    title: "The Four Architecture Domains",
+    summary: "The main areas TOGAF uses to organise architecture thinking.",
+    concept: "TOGAF groups architecture into Business, Data, Application, and Technology domains. Each one provides a different perspective on how the organisation works and what supports it.",
+    why: "Breaking architecture into domains makes complexity easier to manage and helps ensure change is considered across the whole organisation.",
+    analogy: "The four domains are like layers of a city: business is what the city does, data is the information flowing through it, applications are the services people use, and technology is the infrastructure underneath.",
+    detail: "Business Architecture covers capabilities and processes. Data Architecture covers information structure and governance. Application Architecture covers systems and interactions. Technology Architecture covers platforms and infrastructure.",
+    example: "A customer service uplift might affect business processes, customer data, support applications, and the underlying cloud or on-prem infrastructure.",
+    exam: [
+      "The four domains are Business, Data, Application, and Technology",
+      "Security is important but not one of the four core domains"
+    ],
+    takeaway: "TOGAF organises architecture into Business, Data, Application, and Technology domains."
+  },
+  {
+    title: "The ADM",
+    summary: "TOGAF’s core method for developing architecture.",
+    concept: "The Architecture Development Method is the central method in TOGAF. It provides a repeatable cycle for moving from vision through architecture development, planning, implementation support, and change.",
+    why: "It gives architects a consistent way to approach architecture work instead of reinventing the process every time.",
+    analogy: "The ADM is like a city planning cycle: set the vision, design the layout, build what is needed, review how it works, and improve it as the city changes.",
+    detail: "The ADM is iterative rather than strictly linear. It supports the ongoing development and refinement of architecture as business needs evolve.",
+    example: "An organisation modernising legacy systems can use the ADM to move from architecture vision into business, information systems, and technology planning in a structured way.",
+    exam: [
+      "ADM = Architecture Development Method",
+      "It is iterative and repeatable"
+    ],
+    takeaway: "The ADM is a repeatable cycle used to design and manage enterprise architecture."
+  },
+  {
+    title: "Requirements Management",
+    summary: "Requirements are continuously managed across the ADM.",
+    concept: "In TOGAF, requirements are not captured once and forgotten. They are reviewed, refined, and managed throughout the architecture effort to keep the work aligned with business needs.",
+    why: "Requirements change over time. If they are not managed continuously, the architecture can drift away from what the organisation actually needs.",
+    analogy: "Requirements management is like continuously updating a city plan when traffic, population, or services change. The plan must evolve as needs evolve.",
+    detail: "Requirements management interacts with all phases of the ADM. It helps keep architecture decisions traceable and aligned with stakeholder expectations.",
+    example: "If new regulatory needs appear mid-program, requirements management ensures those changes are reflected in architecture decisions instead of being missed.",
+    exam: [
+      "Requirements management is continuous",
+      "It supports every phase of the ADM"
+    ],
+    takeaway: "Requirements in TOGAF are continuously managed across all phases of the ADM."
+  }
+];
+
+/*
 ========================================
 STATE MANAGEMENT
 ========================================
@@ -108,11 +213,10 @@ let currentCard = 0;
 NAVIGATION FUNCTIONS
 ========================================
 */
-
 function startLesson() {
+  currentCard = 0;
   document.getElementById("home").classList.add("hidden");
   document.getElementById("lesson").classList.remove("hidden");
-
   renderLesson();
 }
 
@@ -121,89 +225,90 @@ function goHome() {
   document.getElementById("home").classList.remove("hidden");
 }
 
+function nextCard() {
+  if (currentCard < lessonCards.length - 1) {
+    currentCard++;
+    renderLesson();
+  }
+}
+
+function prevCard() {
+  if (currentCard > 0) {
+    currentCard--;
+    renderLesson();
+  }
+}
+
 /*
 ========================================
 RENDER FUNCTIONS
 ========================================
 */
-
 function renderLesson() {
+  const card = lessonCards[currentCard];
 
-  // ===== LESSON CONTENT (Card 1 only for now) =====
   document.getElementById("lesson").innerHTML = `
     <div class="card">
 
-      <h2>What is TOGAF?</h2>
-      <p><b>A framework for guiding enterprise architecture decisions.</b></p>
+      <div class="meta">Card ${currentCard + 1} of ${lessonCards.length}</div>
+
+      <h2>${card.title}</h2>
+      <p><b>${card.summary}</b></p>
 
       <!-- ===== CONCEPT ===== -->
       <div class="section">
         <h3>Concept</h3>
-        <p>
-        TOGAF is a structured framework used by organisations to design, plan,
-        and manage change. It connects business goals with data, applications,
-        and technology so everything works together.
-        </p>
+        <p>${card.concept}</p>
       </div>
 
       <!-- ===== WHY IT MATTERS ===== -->
       <div class="section">
         <h3>Why it matters</h3>
-        <p>
-        Without structure, organisations make disconnected decisions.
-        TOGAF helps align everything so changes don’t conflict.
-        </p>
+        <p>${card.why}</p>
       </div>
 
       <!-- ===== ANALOGY ===== -->
       <div class="section box">
         <h3>Analogy</h3>
-        <p>
-        TOGAF is like a city blueprint. Instead of building randomly,
-        everything is planned so roads, buildings, and utilities connect.
-        </p>
+        <p>${card.analogy}</p>
       </div>
 
       <!-- ===== DETAILED EXPLANATION ===== -->
       <div class="section">
-        <button onclick="toggle('detail')">Show Detailed Explanation</button>
+        <button class="secondary" onclick="toggle('detail')">Show Detailed Explanation</button>
         <div id="detail" class="hidden">
-          <p>
-          TOGAF provides not just definitions but a full method (ADM),
-          governance guidance, and structure for architecture work.
-          It helps organisations manage complexity across multiple teams.
-          </p>
+          <p>${card.detail}</p>
         </div>
       </div>
 
       <!-- ===== PRACTICAL EXAMPLE ===== -->
       <div class="section">
-        <button onclick="toggle('example')">Show Example</button>
+        <button class="secondary" onclick="toggle('example')">Show Example</button>
         <div id="example" class="hidden">
-          <p>
-          If a company upgrades systems without coordination, things break.
-          TOGAF ensures business, apps, and infrastructure all align.
-          </p>
+          <p>${card.example}</p>
         </div>
       </div>
 
       <!-- ===== EXAM NOTES ===== -->
       <div class="section">
-        <button onclick="toggle('exam')">Show Exam Notes</button>
+        <button class="secondary" onclick="toggle('exam')">Show Exam Notes</button>
         <div id="exam" class="hidden">
-          <p>TOGAF = enterprise architecture framework</p>
-          <p>Not a project method</p>
+          ${card.exam.map(note => `<p>${note}</p>`).join("")}
         </div>
       </div>
 
       <!-- ===== KEY TAKEAWAY ===== -->
-      <div class="section box">
+      <div class="section takeaway">
         <h3>Key Takeaway</h3>
-        <p>TOGAF aligns business and IT change.</p>
+        <p>${card.takeaway}</p>
       </div>
 
       <!-- ===== NAVIGATION ===== -->
-      <button onclick="goHome()">Back</button>
+      <div class="section">
+        <button class="secondary" onclick="goHome()">Back</button>
+        <button class="secondary" onclick="prevCard()" ${currentCard === 0 ? "disabled" : ""}>Previous</button>
+        <button class="primary" onclick="nextCard()" ${currentCard === lessonCards.length - 1 ? "disabled" : ""}>Next</button>
+      </div>
 
     </div>
   `;
@@ -214,12 +319,10 @@ function renderLesson() {
 UTILITY FUNCTIONS
 ========================================
 */
-
 function toggle(id) {
   let el = document.getElementById(id);
   el.classList.toggle("hidden");
 }
-
 </script>
 
 </body>
