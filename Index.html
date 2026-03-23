@@ -1,176 +1,238 @@
+import React, { useMemo, useState } from "react"; import { AnimatePresence, motion } from "framer-motion"; import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"; import { Button } from "@/components/ui/button"; import { Badge } from "@/components/ui/badge"; import { Progress } from "@/components/ui/progress"; import { ChevronLeft, ChevronRight, Layers3, Brain, Puzzle, BookOpen, ClipboardCheck, CheckCircle2, RotateCcw, Lightbulb, ArrowLeft } from "lucide-react";
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TOGAF Lesson Tool</title>
+const lesson = { id: 1, week: "Week 1", title: "TOGAF Foundations", goal: "Understand what TOGAF is, why it exists, the role of enterprise architecture, the four domains, the ADM, and requirements management.", effort: "45–60 mins", cards: [ { id: "what-is-togaf", title: "What is TOGAF?", summary: "A framework for guiding enterprise architecture decisions and change.", concept: "TOGAF is a structured framework used by organisations to design, plan, and manage change. It helps connect business goals with the data, applications, and technology needed to support them, so change happens in a coordinated way rather than as isolated decisions.", whyItMatters: "Without a structure, organisations often make disconnected decisions across teams. TOGAF provides a common way to plan change so business, systems, and technology stay aligned.", analogy: "TOGAF is like the blueprint and construction plan for a city. Instead of randomly building roads, houses, and utilities, you follow a structured plan so everything connects properly and grows in a controlled way.", deeper: [ "TOGAF stands for The Open Group Architecture Framework.", "It is widely used in enterprise and government environments.", "It includes methods, governance guidance, and architecture content concepts.", "It is not tied to a single technology platform or vendor.", ], takeaway: "TOGAF is a framework that helps organisations plan and align business and IT change.", }, { id: "enterprise-architecture", title: "What is Enterprise Architecture?", summary: "The blueprint of how an organisation operates and evolves.", concept: "Enterprise architecture describes how an organisation is structured across business processes, data, systems, and technology. It helps define the current state, the desired future state, and the path between them.", whyItMatters: "It helps decision-makers see the bigger picture instead of making isolated choices. That reduces duplication, improves efficiency, and keeps change aligned to strategy.", analogy: "Enterprise architecture is like a map of the whole city. It shows where everything is, how it connects, and what needs to change if you want the city to grow without causing chaos.", deeper: [ "It spans business, data, application, and technology viewpoints.", "It links strategy to execution.", "It is especially valuable in complex organisations where many systems and stakeholders interact.", ], takeaway: "Enterprise architecture connects business strategy with systems and technology.", }, { id: "four-domains", title: "The Four Architecture Domains", summary: "The main areas TOGAF uses to organise architecture thinking.", concept: "TOGAF groups architecture into four domains: Business Architecture, Data Architecture, Application Architecture, and Technology Architecture. Together they provide different perspectives on how the organisation works and what supports it.", whyItMatters: "Breaking architecture into domains makes complexity easier to manage. It also helps ensure change is considered across the whole organisation, not just in one area.", analogy: "The four domains are like the layers of a city system. Business is what the city does, Data is the information flowing through it, Applications are the services people use, and Technology is the infrastructure underneath that keeps it all running.", deeper: [ "Business Architecture covers capabilities, value, stakeholders, and processes.", "Data Architecture focuses on data structures, ownership, and governance.", "Application Architecture deals with systems, responsibilities, and interfaces.", "Technology Architecture covers infrastructure, platforms, and technical services.", ], takeaway: "TOGAF organises architecture into Business, Data, Application, and Technology domains.", }, { id: "adm", title: "The ADM", summary: "TOGAF’s core method for developing architecture.", concept: "The Architecture Development Method is the central method in TOGAF. It provides a repeatable cycle for moving from architecture vision through domain architectures, planning, implementation support, and ongoing change.", whyItMatters: "It gives architects a consistent way to approach architecture work instead of starting from scratch every time. That makes architecture more repeatable, governed, and adaptable.", analogy: "The ADM is like a city planning cycle: set the vision, design the layout, build what is needed, observe how the city works, and then improve it as the city changes.", deeper: [ "The ADM is iterative rather than strictly one-way.", "It includes phases such as Architecture Vision, Business, Information Systems, Technology, Opportunities and Solutions, Migration Planning, Implementation Governance, and Architecture Change Management.", "Requirements management supports all phases rather than sitting outside them.", ], takeaway: "The ADM is a repeatable cycle used to design and manage enterprise architecture.", }, { id: "requirements", title: "Requirements Management", summary: "Requirements are continuously managed across the ADM.", concept: "In TOGAF, requirements are not captured once and forgotten. They are gathered, reviewed, refined, and managed throughout the architecture effort so the work stays aligned with real business needs.", whyItMatters: "Requirements change. If they are not actively managed, the architecture can drift away from what the organisation actually needs.", analogy: "Requirements management is like continuously updating the city plan when new needs appear. If the population grows, traffic changes, or new services are needed, the plan must evolve instead of staying frozen.", deeper: [ "Requirements management is shown at the centre of the ADM conceptually because it interacts with every phase.", "It captures change impacts and keeps architecture decisions traceable.", "It supports alignment between stakeholder needs and architecture outputs.", ], takeaway: "Requirements in TOGAF are continuously managed across all phases of the ADM.", }, ], summaryPoints: [ "TOGAF is an enterprise architecture framework used to guide organisational change.", "Enterprise architecture links business intent with data, applications, and technology.", "The four main architecture domains are Business, Data, Application, and Technology.", "The ADM is TOGAF’s core method and provides a repeatable architecture cycle.", "Requirements management is continuous and supports every stage of the architecture effort.", ], quiz: [ { question: "What does TOGAF stand for?", options: [ "The Open Governance and Architecture Framework", "The Open Group Architecture Framework", "Technology Organisation Governance and Framework", "Technical Operations Group Architecture Format", ], answer: 1, explanation: "TOGAF stands for The Open Group Architecture Framework.", }, { question: "What is the main purpose of TOGAF?", options: [ "To replace project management methods", "To provide a structured framework for enterprise architecture", "To define only infrastructure standards", "To act as a software development lifecycle", ], answer: 1, explanation: "TOGAF provides a structured approach for enterprise architecture work.", }, { question: "Which option is NOT one of the four architecture domains?", options: ["Business", "Data", "Security", "Technology"], answer: 2, explanation: "Security is important, but it is not one of TOGAF’s four core architecture domains.", }, { question: "Which statement best describes enterprise architecture?", options: [ "A coding standard for developers", "A way to link business strategy with systems and technology", "A framework only for cloud migration", "A budgeting method for IT projects", ], answer: 1, explanation: "Enterprise architecture connects strategy, business operation, systems, and technology.", }, { question: "What is the ADM in TOGAF?", options: [ "Application Delivery Map", "Architecture Delivery Model", "Architecture Development Method", "Architectural Decision Matrix", ], answer: 2, explanation: "ADM stands for Architecture Development Method.", }, { question: "How should the ADM be viewed?", options: [ "As a one-off checklist", "As a repeatable architecture cycle", "As a finance governance process", "As a fixed waterfall process that cannot be revisited", ], answer: 1, explanation: "The ADM is a repeatable, iterative cycle for architecture work.", }, { question: "Which domain focuses on systems and their interactions?", options: ["Data Architecture", "Application Architecture", "Business Architecture", "Technology Architecture"], answer: 1, explanation: "Application Architecture focuses on systems and how they interact.", }, { question: "Which domain is most concerned with infrastructure and platforms?", options: ["Business", "Technology", "Application", "Data"], answer: 1, explanation: "Technology Architecture deals with infrastructure, platforms, and technical services.", }, { question: "Requirements management in TOGAF is:", options: [ "Done only at the beginning", "A continuous activity across the ADM", "Only relevant during implementation", "Handled outside architecture work", ], answer: 1, explanation: "Requirements management continues across all stages of the ADM.", }, { question: "Why is TOGAF useful to organisations?", options: [ "It removes the need for stakeholder engagement", "It guarantees project success", "It creates a common, governed way to plan and manage change", "It is only relevant to government agencies", ], answer: 2, explanation: "TOGAF helps organisations manage change in a structured and governed way.", }, ], };
 
-<style>
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  background: #f5f5f5;
-  color: #222;
+function Pill({ icon: Icon, children }) { return ( <div className="flex items-center gap-2 rounded-2xl bg-slate-100 px-3 py-2 text-sm text-slate-700"> <Icon className="h-4 w-4" /> <span>{children}</span> </div> ); }
+
+function OverviewCard({ item, index, onOpen }) { return ( <Card className="rounded-3xl border-slate-200 shadow-sm hover:shadow-md transition-shadow"> <CardHeader className="space-y-3 pb-3"> <div className="flex items-center justify-between gap-3"> <Badge variant="outline" className="rounded-full">Card {index + 1}</Badge> <Button variant="outline" className="rounded-2xl" onClick={onOpen}> Open card </Button> </div> <CardTitle className="text-xl leading-tight">{item.title}</CardTitle> </CardHeader> <CardContent> <p className="text-sm leading-6 text-slate-600">{item.summary}</p> </CardContent> </Card> ); }
+
+function FocusCard({ item, index, total, onBack, onPrev, onNext, isFirst, isLast }) { const [showDeeper, setShowDeeper] = useState(false);
+
+return ( <motion.div key={item.id} initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.2 }} className="space-y-4" > <div className="flex items-center justify-between gap-3"> <Button variant="ghost" className="rounded-2xl" onClick={onBack}> <ArrowLeft className="mr-2 h-4 w-4" /> Back to lesson </Button> <Badge className="rounded-full">Card {index + 1} of {total}</Badge> </div>
+
+<Card className="rounded-3xl border-none shadow-sm">
+    <CardContent className="p-6 md:p-8 space-y-6">
+      <div className="space-y-3">
+        <p className="text-sm uppercase tracking-[0.25em] text-slate-500">{lesson.title}</p>
+        <h2 className="text-3xl md:text-4xl font-semibold tracking-tight">{item.title}</h2>
+        <p className="text-base text-slate-600 leading-7">{item.summary}</p>
+      </div>
+
+      <section className="space-y-2">
+        <h3 className="text-lg font-semibold flex items-center gap-2"><Brain className="h-5 w-5" /> Concept</h3>
+        <p className="text-slate-700 leading-7">{item.concept}</p>
+      </section>
+
+      <section className="rounded-3xl bg-slate-50 p-5 space-y-2">
+        <h3 className="text-lg font-semibold flex items-center gap-2"><Lightbulb className="h-5 w-5" /> Why it matters</h3>
+        <p className="text-slate-700 leading-7">{item.whyItMatters}</p>
+      </section>
+
+      <section className="rounded-3xl bg-indigo-50 p-5 space-y-2 border border-indigo-100">
+        <h3 className="text-lg font-semibold flex items-center gap-2"><Puzzle className="h-5 w-5" /> Analogy</h3>
+        <p className="text-slate-700 leading-7">{item.analogy}</p>
+      </section>
+
+      <section className="space-y-3">
+        <Button variant="outline" className="rounded-2xl" onClick={() => setShowDeeper((v) => !v)}>
+          {showDeeper ? "Hide deeper detail" : "Go deeper"}
+        </Button>
+        <AnimatePresence>
+          {showDeeper && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="rounded-3xl border border-slate-200 p-5 space-y-3">
+                <h3 className="text-lg font-semibold">Drill deeper</h3>
+                <div className="space-y-3">
+                  {item.deeper.map((point, i) => (
+                    <div key={i} className="rounded-2xl bg-slate-50 px-4 py-3 text-slate-700 leading-6">
+                      {point}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </section>
+
+      <section className="rounded-3xl bg-emerald-50 p-5 border border-emerald-100 space-y-2">
+        <h3 className="text-lg font-semibold flex items-center gap-2"><CheckCircle2 className="h-5 w-5" /> Key takeaway</h3>
+        <p className="text-slate-800 leading-7 font-medium">{item.takeaway}</p>
+      </section>
+    </CardContent>
+  </Card>
+
+  <div className="flex items-center justify-between gap-3">
+    <Button variant="outline" className="rounded-2xl" onClick={onPrev} disabled={isFirst}>
+      <ChevronLeft className="mr-2 h-4 w-4" /> Previous
+    </Button>
+    {isLast ? (
+      <Button className="rounded-2xl" onClick={onNext}>
+        Finish lesson <ClipboardCheck className="ml-2 h-4 w-4" />
+      </Button>
+    ) : (
+      <Button className="rounded-2xl" onClick={onNext}>
+        Next <ChevronRight className="ml-2 h-4 w-4" />
+      </Button>
+    )}
+  </div>
+</motion.div>
+
+); }
+
+function QuizView({ onDone }) { const [current, setCurrent] = useState(0); const [answers, setAnswers] = useState({}); const [showResults, setShowResults] = useState(false);
+
+const q = lesson.quiz[current]; const totalAnswered = Object.keys(answers).length; const progress = Math.round((totalAnswered / lesson.quiz.length) * 100); const score = useMemo( () => lesson.quiz.reduce((sum, item, i) => sum + (answers[i] === item.answer ? 1 : 0), 0), [answers] );
+
+if (showResults) { return ( <div className="space-y-5"> <Card className="rounded-3xl border-none shadow-sm"> <CardContent className="p-6 md:p-8 space-y-6"> <div className="space-y-3"> <Badge className="rounded-full">Quiz complete</Badge> <h2 className="text-3xl font-semibold tracking-tight">You scored {score} / {lesson.quiz.length}</h2> <p className="text-slate-600 leading-7"> {score >= 9 && "Strong result. You’ve got the main Lesson 1 ideas in place."} {score >= 7 && score < 9 && "Good result. You understand the foundations, but a quick revision would help lock them in."} {score < 7 && "A useful first pass. Revisit the cards, especially the ADM and requirements management, then try again."} </p> </div>
+
+<div className="grid gap-3">
+          {lesson.quiz.map((item, i) => {
+            const correct = answers[i] === item.answer;
+            return (
+              <div key={i} className={`rounded-2xl border p-4 ${correct ? "bg-emerald-50 border-emerald-200" : "bg-rose-50 border-rose-200"}`}>
+                <p className="font-medium text-slate-800">{i + 1}. {item.question}</p>
+                <p className="text-sm text-slate-700 mt-2">Correct answer: {item.options[item.answer]}</p>
+                <p className="text-sm text-slate-600 mt-1">{item.explanation}</p>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          <Button className="rounded-2xl" onClick={() => { setAnswers({}); setCurrent(0); setShowResults(false); }}>
+            <RotateCcw className="mr-2 h-4 w-4" /> Retry quiz
+          </Button>
+          <Button variant="outline" className="rounded-2xl" onClick={onDone}>
+            Go to summary
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  </div>
+);
+
 }
 
-.container {
-  max-width: 800px;
-  margin: auto;
-  padding: 16px;
-}
+return ( <div className="space-y-5"> <Card className="rounded-3xl border-none shadow-sm"> <CardContent className="p-6 md:p-8 space-y-6"> <div className="space-y-3"> <div className="flex flex-wrap items-center justify-between gap-3"> <Badge className="rounded-full">Question {current + 1} of {lesson.quiz.length}</Badge> <span className="text-sm text-slate-500">{totalAnswered} answered</span> </div> <Progress value={progress} className="h-2" /> <h2 className="text-2xl md:text-3xl font-semibold tracking-tight">{q.question}</h2> </div>
 
-.card {
-  background: white;
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 12px;
-}
+<div className="grid gap-3">
+        {q.options.map((option, i) => {
+          const selected = answers[current] === i;
+          return (
+            <button
+              key={i}
+              onClick={() => setAnswers((prev) => ({ ...prev, [current]: i }))}
+              className={`text-left rounded-2xl border px-4 py-4 transition-all ${selected ? "border-slate-900 bg-slate-900 text-white" : "border-slate-200 bg-white hover:border-slate-400"}`}
+            >
+              {option}
+            </button>
+          );
+        })}
+      </div>
 
-button {
-  padding: 10px 14px;
-  border-radius: 8px;
-  border: none;
-  margin: 4px;
-  cursor: pointer;
-}
-
-.primary { background: black; color: white; }
-.secondary { background: #ddd; }
-
-.analogy {
-  background: #eef3ff;
-  padding: 10px;
-  border-radius: 8px;
-}
-
-.takeaway {
-  background: #e6f7ea;
-  padding: 10px;
-  border-radius: 8px;
-}
-
-.hidden { display: none; }
-</style>
-</head>
-
-<body>
-
-<div class="container">
-
-<div id="overview">
-  <h2>Lesson 1 – TOGAF Foundations</h2>
-  <p>Understand TOGAF, enterprise architecture, domains, ADM, and requirements.</p>
-  <button class="primary" onclick="startLesson()">Start Lesson</button>
-  <button onclick="showQuiz()">Quiz</button>
-  <button onclick="showSummary()">Summary</button>
+      <div className="flex items-center justify-between gap-3">
+        <Button variant="outline" className="rounded-2xl" onClick={() => setCurrent((c) => Math.max(0, c - 1))} disabled={current === 0}>
+          <ChevronLeft className="mr-2 h-4 w-4" /> Previous
+        </Button>
+        {current === lesson.quiz.length - 1 ? (
+          <Button className="rounded-2xl" onClick={() => setShowResults(true)} disabled={answers[current] === undefined}>
+            Finish quiz
+          </Button>
+        ) : (
+          <Button className="rounded-2xl" onClick={() => setCurrent((c) => Math.min(lesson.quiz.length - 1, c + 1))} disabled={answers[current] === undefined}>
+            Next <ChevronRight className="ml-2 h-4 w-4" />
+          </Button>
+        )}
+      </div>
+    </CardContent>
+  </Card>
 </div>
 
-<div id="lesson" class="hidden"></div>
+); }
 
-<div id="quiz" class="hidden"></div>
+function SummaryView({ onRestartLesson }) { return ( <Card className="rounded-3xl border-none shadow-sm"> <CardContent className="p-6 md:p-8 space-y-6"> <div className="space-y-3"> <Badge className="rounded-full">What you should know now</Badge> <h2 className="text-3xl font-semibold tracking-tight">Lesson 1 summary</h2> <p className="text-slate-600 leading-7">These are the main ideas you should be able to walk away with after completing this lesson.</p> </div>
 
-<div id="summary" class="hidden"></div>
+<div className="space-y-3">
+      {lesson.summaryPoints.map((point, i) => (
+        <div key={i} className="rounded-2xl bg-slate-50 p-4 text-slate-700 leading-7">
+          {point}
+        </div>
+      ))}
+    </div>
 
+    <div className="flex flex-wrap gap-3">
+      <Button className="rounded-2xl" onClick={onRestartLesson}>
+        <BookOpen className="mr-2 h-4 w-4" /> Revisit lesson
+      </Button>
+    </div>
+  </CardContent>
+</Card>
+
+); }
+
+export default function TogafLessonToolV1() { const [view, setView] = useState("overview"); const [focusIndex, setFocusIndex] = useState(null);
+
+const openCard = (index) => { setFocusIndex(index); setView("focus"); };
+
+const focusItem = focusIndex !== null ? lesson.cards[focusIndex] : null;
+
+return ( <div className="min-h-screen bg-slate-100 p-4 md:p-8"> <div className="mx-auto max-w-6xl space-y-6"> <Card className="rounded-[2rem] border-none shadow-sm overflow-hidden"> <CardContent className="p-6 md:p-8"> <div className="flex flex-wrap items-center gap-3 mb-4"> <Badge className="rounded-full">{lesson.week}</Badge> <Badge variant="outline" className="rounded-full">Interactive lesson tool</Badge> </div> <div className="grid lg:grid-cols-[1.3fr_0.7fr] gap-6 items-start"> <div className="space-y-4"> <h1 className="text-4xl md:text-5xl font-semibold tracking-tight text-slate-900">{lesson.title}</h1> <p className="text-slate-600 leading-7 max-w-3xl">{lesson.goal}</p> <div className="flex flex-wrap gap-3"> <Button className="rounded-2xl" onClick={() => openCard(0)}> <BookOpen className="mr-2 h-4 w-4" /> Start lesson </Button> <Button variant="outline" className="rounded-2xl" onClick={() => setView("quiz")}> <ClipboardCheck className="mr-2 h-4 w-4" /> Go to quiz </Button> <Button variant="outline" className="rounded-2xl" onClick={() => setView("summary")}> <CheckCircle2 className="mr-2 h-4 w-4" /> View summary </Button> </div> </div>
+
+<div className="grid gap-3">
+            <Pill icon={Layers3}>{lesson.cards.length} concept cards</Pill>
+            <Pill icon={Brain}>{lesson.quiz.length} question quiz</Pill>
+            <Pill icon={CheckCircle2}>{lesson.effort}</Pill>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+
+    {view === "overview" && (
+      <div className="space-y-5">
+        <div className="space-y-2">
+          <h2 className="text-2xl font-semibold tracking-tight">Lesson cards</h2>
+          <p className="text-slate-600">Start from the top, or open any concept card to enter focus mode.</p>
+        </div>
+        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {lesson.cards.map((item, index) => (
+            <OverviewCard key={item.id} item={item} index={index} onOpen={() => openCard(index)} />
+          ))}
+        </div>
+      </div>
+    )}
+
+    {view === "focus" && focusItem && (
+      <AnimatePresence mode="wait">
+        <FocusCard
+          key={focusItem.id}
+          item={focusItem}
+          index={focusIndex}
+          total={lesson.cards.length}
+          onBack={() => setView("overview")}
+          onPrev={() => setFocusIndex((i) => Math.max(0, i - 1))}
+          onNext={() => {
+            if (focusIndex === lesson.cards.length - 1) {
+              setView("quiz");
+            } else {
+              setFocusIndex((i) => Math.min(lesson.cards.length - 1, i + 1));
+            }
+          }}
+          isFirst={focusIndex === 0}
+          isLast={focusIndex === lesson.cards.length - 1}
+        />
+      </AnimatePresence>
+    )}
+
+    {view === "quiz" && <QuizView onDone={() => setView("summary")} />}
+
+    {view === "summary" && <SummaryView onRestartLesson={() => { setView("overview"); setFocusIndex(null); }} />}
+  </div>
 </div>
 
-<script>
-
-const cards = [
-{
-title: "What is TOGAF?",
-summary: "Framework for guiding enterprise architecture",
-concept: "TOGAF helps organisations plan and manage change by aligning business with technology.",
-why: "Without it, systems become disconnected.",
-analogy: "Like a city blueprint ensuring roads and buildings connect.",
-takeaway: "TOGAF aligns business and IT change."
-},
-{
-title: "Enterprise Architecture",
-summary: "Blueprint of organisation",
-concept: "Describes business, systems, and technology.",
-why: "Helps avoid isolated decisions.",
-analogy: "Like a map of a city.",
-takeaway: "Connects strategy with systems."
-}
-];
-
-let current = 0;
-
-function startLesson() {
-  document.getElementById("overview").classList.add("hidden");
-  document.getElementById("lesson").classList.remove("hidden");
-  renderCard();
-}
-
-function renderCard() {
-  const c = cards[current];
-  document.getElementById("lesson").innerHTML = `
-    <div class="card">
-      <h3>${c.title}</h3>
-      <p><b>${c.summary}</b></p>
-      <p>${c.concept}</p>
-      <p><b>Why it matters:</b> ${c.why}</p>
-      <div class="analogy"><b>Analogy:</b> ${c.analogy}</div>
-      <div class="takeaway"><b>Takeaway:</b> ${c.takeaway}</div>
-
-      <button onclick="prev()">Prev</button>
-      <button class="primary" onclick="next()">Next</button>
-    </div>
-  `;
-}
-
-function next() {
-  if (current < cards.length - 1) {
-    current++;
-    renderCard();
-  } else {
-    showQuiz();
-  }
-}
-
-function prev() {
-  if (current > 0) {
-    current--;
-    renderCard();
-  }
-}
-
-function showQuiz() {
-  document.getElementById("lesson").classList.add("hidden");
-  document.getElementById("quiz").classList.remove("hidden");
-
-  document.getElementById("quiz").innerHTML = `
-    <div class="card">
-      <h3>Quick Quiz</h3>
-      <p>What does TOGAF stand for?</p>
-      <button onclick="answer(true)">The Open Group Architecture Framework</button>
-      <button onclick="answer(false)">Something else</button>
-    </div>
-  `;
-}
-
-function answer(correct) {
-  alert(correct ? "Correct!" : "Try again");
-}
-
-function showSummary() {
-  document.getElementById("overview").classList.add("hidden");
-  document.getElementById("quiz").classList.add("hidden");
-  document.getElementById("summary").classList.remove("hidden");
-
-  document.getElementById("summary").innerHTML = `
-    <div class="card">
-      <h3>What you should know</h3>
-      <ul>
-        <li>TOGAF is a framework</li>
-        <li>Enterprise architecture links business and IT</li>
-      </ul>
-    </div>
-  `;
-}
-
-</script>
-
-</body>
-</html>
+); }
