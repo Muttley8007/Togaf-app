@@ -1,1 +1,226 @@
+<!-- 
+========================================
+TOGAF LESSON TOOL
+Version: v0.1
+Date: 2026-03-23
 
+CHANGE LOG:
+- Initial working concept
+- Single lesson (What is TOGAF)
+- Expandable sections (detail, example, exam notes)
+- Basic navigation (home ↔ lesson)
+
+NEXT:
+- Add multiple cards
+- Add card navigation (next/prev)
+- Add quiz
+========================================
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TOGAF Lesson Tool</title>
+
+<style>
+/* ===== GLOBAL STYLES ===== */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  background: #f4f4f4;
+}
+
+.container {
+  max-width: 800px;
+  margin: auto;
+  padding: 16px;
+}
+
+.card {
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+h2, h3 {
+  margin-top: 0;
+}
+
+button {
+  padding: 10px;
+  margin: 5px;
+  border-radius: 8px;
+  border: none;
+}
+
+/* ===== BUTTON STYLES ===== */
+.primary {
+  background: black;
+  color: white;
+}
+
+/* ===== SECTION STYLES ===== */
+.section {
+  margin-top: 15px;
+}
+
+.box {
+  background: #f0f3ff;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.hidden {
+  display: none;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- ===== HOME SCREEN ===== -->
+<div id="home">
+  <h2>Lesson 1 - TOGAF Foundations</h2>
+  <p>Understand what TOGAF is and how it works.</p>
+  <button class="primary" onclick="startLesson()">Start Lesson</button>
+</div>
+
+<!-- ===== LESSON SCREEN ===== -->
+<div id="lesson" class="hidden"></div>
+
+</div>
+
+<script>
+
+/* 
+========================================
+STATE MANAGEMENT
+========================================
+*/
+let currentCard = 0;
+
+/*
+========================================
+NAVIGATION FUNCTIONS
+========================================
+*/
+
+function startLesson() {
+  document.getElementById("home").classList.add("hidden");
+  document.getElementById("lesson").classList.remove("hidden");
+
+  renderLesson();
+}
+
+function goHome() {
+  document.getElementById("lesson").classList.add("hidden");
+  document.getElementById("home").classList.remove("hidden");
+}
+
+/*
+========================================
+RENDER FUNCTIONS
+========================================
+*/
+
+function renderLesson() {
+
+  // ===== LESSON CONTENT (Card 1 only for now) =====
+  document.getElementById("lesson").innerHTML = `
+    <div class="card">
+
+      <h2>What is TOGAF?</h2>
+      <p><b>A framework for guiding enterprise architecture decisions.</b></p>
+
+      <!-- ===== CONCEPT ===== -->
+      <div class="section">
+        <h3>Concept</h3>
+        <p>
+        TOGAF is a structured framework used by organisations to design, plan,
+        and manage change. It connects business goals with data, applications,
+        and technology so everything works together.
+        </p>
+      </div>
+
+      <!-- ===== WHY IT MATTERS ===== -->
+      <div class="section">
+        <h3>Why it matters</h3>
+        <p>
+        Without structure, organisations make disconnected decisions.
+        TOGAF helps align everything so changes don’t conflict.
+        </p>
+      </div>
+
+      <!-- ===== ANALOGY ===== -->
+      <div class="section box">
+        <h3>Analogy</h3>
+        <p>
+        TOGAF is like a city blueprint. Instead of building randomly,
+        everything is planned so roads, buildings, and utilities connect.
+        </p>
+      </div>
+
+      <!-- ===== DETAILED EXPLANATION ===== -->
+      <div class="section">
+        <button onclick="toggle('detail')">Show Detailed Explanation</button>
+        <div id="detail" class="hidden">
+          <p>
+          TOGAF provides not just definitions but a full method (ADM),
+          governance guidance, and structure for architecture work.
+          It helps organisations manage complexity across multiple teams.
+          </p>
+        </div>
+      </div>
+
+      <!-- ===== PRACTICAL EXAMPLE ===== -->
+      <div class="section">
+        <button onclick="toggle('example')">Show Example</button>
+        <div id="example" class="hidden">
+          <p>
+          If a company upgrades systems without coordination, things break.
+          TOGAF ensures business, apps, and infrastructure all align.
+          </p>
+        </div>
+      </div>
+
+      <!-- ===== EXAM NOTES ===== -->
+      <div class="section">
+        <button onclick="toggle('exam')">Show Exam Notes</button>
+        <div id="exam" class="hidden">
+          <p>TOGAF = enterprise architecture framework</p>
+          <p>Not a project method</p>
+        </div>
+      </div>
+
+      <!-- ===== KEY TAKEAWAY ===== -->
+      <div class="section box">
+        <h3>Key Takeaway</h3>
+        <p>TOGAF aligns business and IT change.</p>
+      </div>
+
+      <!-- ===== NAVIGATION ===== -->
+      <button onclick="goHome()">Back</button>
+
+    </div>
+  `;
+}
+
+/*
+========================================
+UTILITY FUNCTIONS
+========================================
+*/
+
+function toggle(id) {
+  let el = document.getElementById(id);
+  el.classList.toggle("hidden");
+}
+
+</script>
+
+</body>
+</html>
