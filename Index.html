@@ -1,189 +1,31 @@
-<!-- 
-========================================
-TOGAF LESSON TOOL
-Version: v0.4
-Date: 2026-03-23
-
-CHANGE LOG:
-- Added quiz system
-- 10 questions (Lesson 1)
-- One-question flow
-- Score screen
-- "Finish lesson → Quiz" transition
-
-NEXT:
-- Add summary screen
-- Improve UI spacing
-- Add progress memory
-========================================
--->
-
+<!-- TOGAF TOOL v0.6 -->
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>TOGAF Lesson Tool</title>
-
-<style>
-body { font-family: Arial; margin:0; background:#f4f4f4; }
-.container { max-width:800px; margin:auto; padding:16px; }
-
-.card { background:white; padding:16px; border-radius:12px; margin-bottom:12px; }
-
-button { padding:10px; margin:5px; border:none; border-radius:8px; }
-.primary { background:black; color:white; }
-.secondary { background:#ddd; }
-
-.hidden { display:none; }
-.section { margin-top:15px; }
-.box { background:#eef3ff; padding:10px; border-radius:8px; }
-.takeaway { background:#e6f7ea; padding:10px; border-radius:8px; }
-.meta { font-size:14px; color:#666; }
-</style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TOGAF Tool</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
 <div class="container">
-
-<div id="home">
-  <div class="card">
-    <h2>Lesson 1 - TOGAF Foundations</h2>
-    <button class="primary" onclick="showOverview()">Start Lesson</button>
+  <div id="home">
+    <div class="card">
+      <h2 id="lesson-title"></h2>
+      <p id="lesson-description"></p>
+      <button class="primary" onclick="showOverview()">Start Lesson</button>
+    </div>
   </div>
+
+  <div id="overview" class="hidden"></div>
+  <div id="lesson" class="hidden"></div>
+  <div id="quiz" class="hidden"></div>
+  <div id="summary" class="hidden"></div>
 </div>
 
-<div id="overview" class="hidden"></div>
-<div id="lesson" class="hidden"></div>
-<div id="quiz" class="hidden"></div>
-
-</div>
-
-<script>
-
-/* ===== LESSON ===== */
-const lessonCards = [
-  {title:"What is TOGAF?",summary:"Framework",concept:"Aligns business and IT",why:"Avoids chaos",analogy:"City blueprint",takeaway:"Aligns IT"},
-  {title:"Enterprise Architecture",summary:"Blueprint",concept:"Structure of org",why:"Whole view",analogy:"City map",takeaway:"Connects strategy"},
-  {title:"Domains",summary:"4 areas",concept:"Business/Data/App/Tech",why:"Simplifies",analogy:"City layers",takeaway:"4 domains"}
-];
-
-/* ===== QUIZ ===== */
-const quiz = [
-  {q:"TOGAF stands for?",a:["Wrong","The Open Group Architecture Framework"],c:1},
-  {q:"TOGAF is?",a:["Framework","Programming language"],c:0},
-  {q:"Enterprise Architecture links?",a:["Games","Business & IT"],c:1},
-  {q:"How many domains?",a:["4","10"],c:0},
-  {q:"ADM is?",a:["Method","Database"],c:0},
-  {q:"TOGAF is NOT?",a:["Framework","Project method"],c:1},
-  {q:"Domains include?",a:["Tech","Music"],c:0},
-  {q:"EA helps?",a:["Chaos","Alignment"],c:1},
-  {q:"Requirements are?",a:["Static","Continuous"],c:1},
-  {q:"TOGAF helps?",a:["Align","Break"],c:0}
-];
-
-/* ===== STATE ===== */
-let currentCard = 0;
-let qIndex = 0;
-let score = 0;
-
-/* ===== NAV ===== */
-function showOverview(){
-  hideAll();
-  overview.classList.remove("hidden");
-
-  let html="<h3>Cards</h3>";
-  lessonCards.forEach((c,i)=>{
-    html+=`<div class="card"><h4>${c.title}</h4><button onclick="openCard(${i})">Open</button></div>`;
-  });
-
-  overview.innerHTML=html;
-}
-
-function openCard(i){
-  currentCard=i;
-  hideAll();
-  lesson.classList.remove("hidden");
-  renderCard();
-}
-
-function renderCard(){
-  let c=lessonCards[currentCard];
-
-  lesson.innerHTML=`
-    <div class="card">
-      <div class="meta">Card ${currentCard+1}/${lessonCards.length}</div>
-      <h2>${c.title}</h2>
-      <p>${c.summary}</p>
-
-      <div class="section"><b>Concept:</b> ${c.concept}</div>
-      <div class="section"><b>Why:</b> ${c.why}</div>
-      <div class="section box"><b>Analogy:</b> ${c.analogy}</div>
-
-      <div class="section takeaway"><b>Takeaway:</b> ${c.takeaway}</div>
-
-      <button onclick="showOverview()">Back</button>
-      <button onclick="prevCard()" ${currentCard==0?"disabled":""}>Prev</button>
-      ${currentCard==lessonCards.length-1
-        ? `<button class="primary" onclick="startQuiz()">Start Quiz</button>`
-        : `<button class="primary" onclick="nextCard()">Next</button>`}
-    </div>
-  `;
-}
-
-function nextCard(){currentCard++;renderCard();}
-function prevCard(){currentCard--;renderCard();}
-
-/* ===== QUIZ ===== */
-function startQuiz(){
-  hideAll();
-  quizDiv.classList.remove("hidden");
-  qIndex=0;
-  score=0;
-  renderQuiz();
-}
-
-function renderQuiz(){
-  let q=quiz[qIndex];
-
-  quizDiv.innerHTML=`
-    <div class="card">
-      <div class="meta">Q ${qIndex+1}/10</div>
-      <h3>${q.q}</h3>
-      ${q.a.map((opt,i)=>`<button onclick="answer(${i})">${opt}</button>`).join("")}
-    </div>
-  `;
-}
-
-function answer(i){
-  if(i==quiz[qIndex].c) score++;
-  qIndex++;
-
-  if(qIndex<quiz.length){
-    renderQuiz();
-  } else {
-    showScore();
-  }
-}
-
-function showScore(){
-  quizDiv.innerHTML=`
-    <div class="card">
-      <h2>Score: ${score}/10</h2>
-      <button onclick="showOverview()">Back to lesson</button>
-    </div>
-  `;
-}
-
-/* ===== UTIL ===== */
-function hideAll(){
-  home.classList.add("hidden");
-  overview.classList.add("hidden");
-  lesson.classList.add("hidden");
-  quizDiv.classList.add("hidden");
-}
-
-</script>
+<script src="lesson1.js"></script>
+<script src="app.js"></script>
 
 </body>
 </html>
