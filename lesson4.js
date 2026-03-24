@@ -1,9 +1,4 @@
-const lesson4 = {
-  title: "Lesson 4 - Coming Soon",
-  description: "This lesson is planned but not built yet.",
-  cards: [
-    {
-      titl// TOGAF TOOL v1.0.2
+// TOGAF TOOL v1.0.2
 // lesson4.js
 
 const lesson4 = {
