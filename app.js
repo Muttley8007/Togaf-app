@@ -112,6 +112,41 @@ function renderCard() {
       </div>
 
       ${
+        card.textbook
+          ? `
+      <div class="section">
+        <button class="secondary" onclick="toggle('textbook')">Read Textbook Explanation</button>
+        <div id="textbook" class="hidden">
+          <div class="card" style="margin-top:12px; background:#fafafa;">
+            <p>${card.textbook.intro || ""}</p>
+            ${
+              (card.textbook.sections || []).map(section => `
+                <div class="section">
+                  <h3>${section.heading}</h3>
+                  <p>${section.body}</p>
+                </div>
+              `).join("")
+            }
+          </div>
+        </div>
+      </div>
+      `
+          : ""
+      }
+
+      ${
+        card.reference
+          ? `
+      <div class="section">
+        <a href="${card.reference.url}" target="_blank" rel="noopener noreferrer">
+          <button class="secondary">${card.reference.label}</button>
+        </a>
+      </div>
+      `
+          : ""
+      }
+
+      ${
         card.detail
           ? `
       <div class="section">
