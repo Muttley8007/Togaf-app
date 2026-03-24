@@ -7,7 +7,24 @@ let activeLesson = null;
 let currentCard = 0;
 let qIndex = 0;
 let score = 0;
+
 let progress = JSON.parse(localStorage.getItem("togafProgress")) || {};
+
+function saveProgress() {
+  localStorage.setItem("togafProgress", JSON.stringify(progress));
+}
+
+function ensureLessonProgress() {
+  if (!activeLesson) return;
+
+  if (!progress[activeLesson.title]) {
+    progress[activeLesson.title] = {
+      viewed: false,
+      cardsViewed: [],
+      quizScore: null
+    };
+  }
+}
 
 const home = document.getElementById("home");
 const overview = document.getElementById("overview");
