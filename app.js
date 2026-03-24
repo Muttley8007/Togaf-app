@@ -1,4 +1,4 @@
-// TOGAF TOOL v0.6.1
+// TOGAF TOOL v0.8
 
 const activeLesson = lesson1;
 
@@ -20,41 +20,47 @@ function hideAll() {
   summary.classList.add("hidden");
 }
 
+function goHome() {
+  hideAll();
+  home.classList.remove("hidden");
+}
+
 function showOverview() {
   hideAll();
   overview.classList.remove("hidden");
 
-  let html = `<div class="card">
-    <h2>${activeLesson.title}</h2>
-    <p>${activeLesson.description}</p>
-  </div>`;
+  let html = `
+    <div class="card">
+      <h2>${activeLesson.title}</h2>
+      <p>${activeLesson.description}</p>
+    </div>
+  `;
 
-  html += `<h3>Cards</h3>`;
+  html += `<h3>Lesson Cards</h3>`;
 
   activeLesson.cards.forEach((c, i) => {
     html += `
       <div class="card">
-        <h4>${c.title}</h4>
-        <p>${c.summary}</p>
-        <button class="primary" onclick="openCard(${i})">Open</button>
+        <h4 class="preview-title">${c.title}</h4>
+        <p class="preview-summary">${c.summary}</p>
+        <div class="button-row">
+          <button class="primary" onclick="openCard(${i})">Open</button>
+        </div>
       </div>
     `;
   });
 
   html += `
     <div class="card">
-      <button class="secondary" onclick="goHome()">Back Home</button>
-      <button class="primary" onclick="startQuiz()">Quiz</button>
-      <button class="secondary" onclick="showSummary()">Summary</button>
+      <div class="button-row">
+        <button class="secondary" onclick="goHome()">Back Home</button>
+        <button class="primary" onclick="startQuiz()">Quiz</button>
+        <button class="secondary" onclick="showSummary()">Summary</button>
+      </div>
     </div>
   `;
 
   overview.innerHTML = html;
-}
-
-function goHome() {
-  hideAll();
-  home.classList.remove("hidden");
 }
 
 function openCard(index) {
@@ -64,19 +70,19 @@ function openCard(index) {
   renderCard();
 }
 
+function prevCard() {
+  if (currentCard > 0) {
+    currentCard--;
+    renderCard();
+  }
+}
+
 function nextCard() {
   if (currentCard < activeLesson.cards.length - 1) {
     currentCard++;
     renderCard();
   } else {
     startQuiz();
-  }
-}
-
-function prevCard() {
-  if (currentCard > 0) {
-    currentCard--;
-    renderCard();
   }
 }
 
@@ -149,7 +155,7 @@ function renderCard() {
         <p>${card.takeaway || ""}</p>
       </div>
 
-      <div class="section">
+      <div class="section button-row">
         <button class="secondary" onclick="showOverview()">Back</button>
         <button class="secondary" onclick="prevCard()" ${currentCard === 0 ? "disabled" : ""}>Previous</button>
         <button class="primary" onclick="nextCard()">
@@ -161,7 +167,6 @@ function renderCard() {
 }
 
 function startQuiz() {
-  currentCard = 0;
   qIndex = 0;
   score = 0;
   hideAll();
@@ -176,12 +181,14 @@ function renderQuizQuestion() {
     <div class="card">
       <div class="meta">Question ${qIndex + 1} of ${activeLesson.quiz.length}</div>
       <h2>${q.q}</h2>
-      ${q.a.map((option, i) => `
-        <div>
+
+      <div class="answer-list">
+        ${q.a.map((option, i) => `
           <button class="secondary" onclick="answerQuestion(${i})">${option}</button>
-        </div>
-      `).join("")}
-      <div class="section">
+        `).join("")}
+      </div>
+
+      <div class="section button-row">
         <button class="secondary" onclick="showOverview()">Back to Lesson</button>
       </div>
     </div>
@@ -190,7 +197,9 @@ function renderQuizQuestion() {
 
 function answerQuestion(index) {
   const q = activeLesson.quiz[qIndex];
-  if (index === q.c) score++;
+  if (index === q.c) {
+    score++;
+  }
 
   qIndex++;
 
@@ -206,8 +215,10 @@ function showQuizResults() {
     <div class="card">
       <h2>Quiz Complete</h2>
       <p>You scored <b>${score}</b> out of <b>${activeLesson.quiz.length}</b>.</p>
-      <button class="primary" onclick="showSummary()">View Summary</button>
-      <button class="secondary" onclick="showOverview()">Back to Lesson</button>
+      <div class="section button-row">
+        <button class="primary" onclick="showSummary()">View Summary</button>
+        <button class="secondary" onclick="showOverview()">Back to Lesson</button>
+      </div>
     </div>
   `;
 }
@@ -219,8 +230,10 @@ function showSummary() {
   summary.innerHTML = `
     <div class="card">
       <h2>What You Should Know Now</h2>
-      ${activeLesson.summary.map(item => `<p>${item}</p>`).join("")}
-      <div class="section">
+      <div class="summary-list">
+        ${activeLesson.summary.map(item => `<p>${item}</p>`).join("")}
+      </div>
+      <div class="section button-row">
         <button class="secondary" onclick="showOverview()">Back to Lesson</button>
       </div>
     </div>
@@ -229,7 +242,9 @@ function showSummary() {
 
 function toggle(id) {
   const el = document.getElementById(id);
-  if (el) el.classList.toggle("hidden");
+  if (el) {
+    el.classList.toggle("hidden");
+  }
 }
 
 goHome();
