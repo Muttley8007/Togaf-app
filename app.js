@@ -1,8 +1,9 @@
-// TOGAF TOOL v0.8.4
+// TOGAF TOOL v1.0.0
 // app.js
 
 const lessons = [lesson1, lesson2];
 
+let activeLesson = null;
 let currentCard = 0;
 let qIndex = 0;
 let score = 0;
@@ -21,12 +22,43 @@ function hideAll() {
   summary.classList.add("hidden");
 }
 
-function goHome() {
+function showHome() {
   hideAll();
   home.classList.remove("hidden");
+
+  let html = "";
+  html += '<div class="card">';
+  html += "<h2>TOGAF Lesson Tool</h2>";
+  html += "<p>Select a lesson to begin.</p>";
+  html += "</div>";
+
+  lessons.forEach(function(lessonObj, i) {
+    html += '<div class="card">';
+    html += "<h3>" + lessonObj.title + "</h3>";
+    html += "<p>" + lessonObj.description + "</p>";
+    html += '<div class="button-row">';
+    html += '<button class="primary" onclick="selectLesson(' + i + ')">Open Lesson</button>';
+    html += "</div>";
+    html += "</div>";
+  });
+
+  home.innerHTML = html;
+}
+
+function selectLesson(index) {
+  activeLesson = lessons[index];
+  currentCard = 0;
+  qIndex = 0;
+  score = 0;
+  showOverview();
 }
 
 function showOverview() {
+  if (!activeLesson) {
+    showHome();
+    return;
+  }
+
   hideAll();
   overview.classList.remove("hidden");
 
@@ -50,7 +82,7 @@ function showOverview() {
 
   html += '<div class="card">';
   html += '<div class="button-row">';
-  html += '<button class="secondary" onclick="goHome()">Back Home</button>';
+  html += '<button class="secondary" onclick="showHome()">Back Home</button>';
   html += '<button class="primary" onclick="startQuiz()">Quiz</button>';
   html += '<button class="secondary" onclick="showSummary()">Summary</button>';
   html += "</div>";
@@ -189,6 +221,11 @@ function renderCard() {
 }
 
 function startQuiz() {
+  if (!activeLesson) {
+    showHome();
+    return;
+  }
+
   qIndex = 0;
   score = 0;
   hideAll();
@@ -250,6 +287,11 @@ function showQuizResults() {
 }
 
 function showSummary() {
+  if (!activeLesson) {
+    showHome();
+    return;
+  }
+
   hideAll();
   summary.classList.remove("hidden");
 
@@ -278,4 +320,4 @@ function toggle(id) {
   }
 }
 
-goHome();
+showHome();
