@@ -1,4 +1,4 @@
-// TOGAF TOOL v0.8
+// TOGAF TOOL v0.8.2
 
 const activeLesson = lesson1;
 
@@ -29,36 +29,31 @@ function showOverview() {
   hideAll();
   overview.classList.remove("hidden");
 
-  let html = `
-    <div class="card">
-      <h2>${activeLesson.title}</h2>
-      <p>${activeLesson.description}</p>
-    </div>
-  `;
+  let html = '';
+  html += '<div class="card">';
+  html += '<h2>' + activeLesson.title + '</h2>';
+  html += '<p>' + activeLesson.description + '</p>';
+  html += '</div>';
 
-  html += `<h3>Lesson Cards</h3>`;
+  html += '<h3>Lesson Cards</h3>';
 
-  activeLesson.cards.forEach((c, i) => {
-    html += `
-      <div class="card">
-        <h4 class="preview-title">${c.title}</h4>
-        <p class="preview-summary">${c.summary}</p>
-        <div class="button-row">
-          <button class="primary" onclick="openCard(${i})">Open</button>
-        </div>
-      </div>
-    `;
+  activeLesson.cards.forEach(function(card, i) {
+    html += '<div class="card">';
+    html += '<h4 class="preview-title">' + card.title + '</h4>';
+    html += '<p class="preview-summary">' + (card.summary || '') + '</p>';
+    html += '<div class="button-row">';
+    html += '<button class="primary" onclick="openCard(' + i + ')">Open</button>';
+    html += '</div>';
+    html += '</div>';
   });
 
-  html += `
-    <div class="card">
-      <div class="button-row">
-        <button class="secondary" onclick="goHome()">Back Home</button>
-        <button class="primary" onclick="startQuiz()">Quiz</button>
-        <button class="secondary" onclick="showSummary()">Summary</button>
-      </div>
-    </div>
-  `;
+  html += '<div class="card">';
+  html += '<div class="button-row">';
+  html += '<button class="secondary" onclick="goHome()">Back Home</button>';
+  html += '<button class="primary" onclick="startQuiz()">Quiz</button>';
+  html += '<button class="secondary" onclick="showSummary()">Summary</button>';
+  html += '</div>';
+  html += '</div>';
 
   overview.innerHTML = html;
 }
@@ -88,117 +83,101 @@ function nextCard() {
 
 function renderCard() {
   const card = activeLesson.cards[currentCard];
+  let html = '';
 
-  lesson.innerHTML = `
-    <div class="card">
-      <div class="meta">Card ${currentCard + 1} of ${activeLesson.cards.length}</div>
+  html += '<div class="card">';
+  html += '<div class="meta">Card ' + (currentCard + 1) + ' of ' + activeLesson.cards.length + '</div>';
 
-      <h2>${card.title}</h2>
-      <p><b>${card.summary || ""}</b></p>
+  html += '<h2>' + card.title + '</h2>';
+  html += '<p><b>' + (card.summary || '') + '</b></p>';
 
-      <div class="section">
-        <h3>Concept</h3>
-        <p>${card.concept || ""}</p>
-      </div>
+  html += '<div class="section">';
+  html += '<h3>Concept</h3>';
+  html += '<p>' + (card.concept || '') + '</p>';
+  html += '</div>';
 
-      <div class="section">
-        <h3>Why it matters</h3>
-        <p>${card.why || ""}</p>
-      </div>
+  html += '<div class="section">';
+  html += '<h3>Why it matters</h3>';
+  html += '<p>' + (card.why || '') + '</p>';
+  html += '</div>';
 
-      <div class="section box">
-        <h3>Analogy</h3>
-        <p>${card.analogy || ""}</p>
-      </div>
+  html += '<div class="section box">';
+  html += '<h3>Analogy</h3>';
+  html += '<p>' + (card.analogy || '') + '</p>';
+  html += '</div>';
 
-      ${
-        card.textbook
-          ? `
-      <div class="section">
-        <button class="secondary" onclick="toggle('textbook')">Read Textbook Explanation</button>
-        <div id="textbook" class="hidden">
-          <div class="card" style="margin-top:12px; background:#fafafa;">
-            <p>${card.textbook.intro || ""}</p>
-            ${
-              (card.textbook.sections || []).map(section => `
-                <div class="section">
-                  <h3>${section.heading}</h3>
-                  <p>${section.body}</p>
-                </div>
-              `).join("")
-            }
-          </div>
-        </div>
-      </div>
-      `
-          : ""
-      }
+  if (card.textbook) {
+    html += '<div class="section">';
+    html += '<button class="secondary" onclick="toggle(\'textbook\')">Read Textbook Explanation</button>';
+    html += '<div id="textbook" class="hidden">';
+    html += '<div class="card" style="margin-top:12px; background:#fafafa;">';
+    html += '<p>' + (card.textbook.intro || '') + '</p>';
 
-      ${
-        card.reference
-          ? `
-      <div class="section">
-        <a href="${card.reference.url}" target="_blank" rel="noopener noreferrer">
-          <button class="secondary">${card.reference.label}</button>
-        </a>
-      </div>
-      `
-          : ""
-      }
+    if (card.textbook.sections && card.textbook.sections.length) {
+      card.textbook.sections.forEach(function(section) {
+        html += '<div class="section">';
+        html += '<h3>' + section.heading + '</h3>';
+        html += '<p>' + section.body + '</p>';
+        html += '</div>';
+      });
+    }
 
-      ${
-        card.detail
-          ? `
-      <div class="section">
-        <button class="secondary" onclick="toggle('detail')">Show Detailed Explanation</button>
-        <div id="detail" class="hidden">
-          <p>${card.detail}</p>
-        </div>
-      </div>
-      `
-          : ""
-      }
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+  }
 
-      ${
-        card.example
-          ? `
-      <div class="section">
-        <button class="secondary" onclick="toggle('example')">Show Example</button>
-        <div id="example" class="hidden">
-          <p>${card.example}</p>
-        </div>
-      </div>
-      `
-          : ""
-      }
+  if (card.reference) {
+    html += '<div class="section">';
+    html += '<a href="' + card.reference.url + '" target="_blank" rel="noopener noreferrer">';
+    html += '<button class="secondary">' + card.reference.label + '</button>';
+    html += '</a>';
+    html += '</div>';
+  }
 
-      ${
-        card.exam
-          ? `
-      <div class="section">
-        <button class="secondary" onclick="toggle('exam')">Show Exam Notes</button>
-        <div id="exam" class="hidden">
-          ${card.exam.map(note => `<p>${note}</p>`).join("")}
-        </div>
-      </div>
-      `
-          : ""
-      }
+  if (card.detail) {
+    html += '<div class="section">';
+    html += '<button class="secondary" onclick="toggle(\'detail\')">Show Detailed Explanation</button>';
+    html += '<div id="detail" class="hidden">';
+    html += '<p>' + card.detail + '</p>';
+    html += '</div>';
+    html += '</div>';
+  }
 
-      <div class="section takeaway">
-        <h3>Key Takeaway</h3>
-        <p>${card.takeaway || ""}</p>
-      </div>
+  if (card.example) {
+    html += '<div class="section">';
+    html += '<button class="secondary" onclick="toggle(\'example\')">Show Example</button>';
+    html += '<div id="example" class="hidden">';
+    html += '<p>' + card.example + '</p>';
+    html += '</div>';
+    html += '</div>';
+  }
 
-      <div class="section button-row">
-        <button class="secondary" onclick="showOverview()">Back</button>
-        <button class="secondary" onclick="prevCard()" ${currentCard === 0 ? "disabled" : ""}>Previous</button>
-        <button class="primary" onclick="nextCard()">
-          ${currentCard === activeLesson.cards.length - 1 ? "Start Quiz" : "Next"}
-        </button>
-      </div>
-    </div>
-  `;
+  if (card.exam && card.exam.length) {
+    html += '<div class="section">';
+    html += '<button class="secondary" onclick="toggle(\'exam\')">Show Exam Notes</button>';
+    html += '<div id="exam" class="hidden">';
+    card.exam.forEach(function(note) {
+      html += '<p>' + note + '</p>';
+    });
+    html += '</div>';
+    html += '</div>';
+  }
+
+  html += '<div class="section takeaway">';
+  html += '<h3>Key Takeaway</h3>';
+  html += '<p>' + (card.takeaway || '') + '</p>';
+  html += '</div>';
+
+  html += '<div class="section button-row">';
+  html += '<button class="secondary" onclick="showOverview()">Back</button>';
+  html += '<button class="secondary" onclick="prevCard()" ' + (currentCard === 0 ? 'disabled' : '') + '>Previous</button>';
+  html += '<button class="primary" onclick="nextCard()">' + (currentCard === activeLesson.cards.length - 1 ? 'Start Quiz' : 'Next') + '</button>';
+  html += '</div>';
+
+  html += '</div>';
+
+  lesson.innerHTML = html;
 }
 
 function startQuiz() {
@@ -211,27 +190,29 @@ function startQuiz() {
 
 function renderQuizQuestion() {
   const q = activeLesson.quiz[qIndex];
+  let html = '';
 
-  quiz.innerHTML = `
-    <div class="card">
-      <div class="meta">Question ${qIndex + 1} of ${activeLesson.quiz.length}</div>
-      <h2>${q.q}</h2>
+  html += '<div class="card">';
+  html += '<div class="meta">Question ' + (qIndex + 1) + ' of ' + activeLesson.quiz.length + '</div>';
+  html += '<h2>' + q.q + '</h2>';
+  html += '<div class="answer-list">';
 
-      <div class="answer-list">
-        ${q.a.map((option, i) => `
-          <button class="secondary" onclick="answerQuestion(${i})">${option}</button>
-        `).join("")}
-      </div>
+  q.a.forEach(function(option, i) {
+    html += '<button class="secondary" onclick="answerQuestion(' + i + ')">' + option + '</button>';
+  });
 
-      <div class="section button-row">
-        <button class="secondary" onclick="showOverview()">Back to Lesson</button>
-      </div>
-    </div>
-  `;
+  html += '</div>';
+  html += '<div class="section button-row">';
+  html += '<button class="secondary" onclick="showOverview()">Back to Lesson</button>';
+  html += '</div>';
+  html += '</div>';
+
+  quiz.innerHTML = html;
 }
 
 function answerQuestion(index) {
   const q = activeLesson.quiz[qIndex];
+
   if (index === q.c) {
     score++;
   }
@@ -246,33 +227,40 @@ function answerQuestion(index) {
 }
 
 function showQuizResults() {
-  quiz.innerHTML = `
-    <div class="card">
-      <h2>Quiz Complete</h2>
-      <p>You scored <b>${score}</b> out of <b>${activeLesson.quiz.length}</b>.</p>
-      <div class="section button-row">
-        <button class="primary" onclick="showSummary()">View Summary</button>
-        <button class="secondary" onclick="showOverview()">Back to Lesson</button>
-      </div>
-    </div>
-  `;
+  let html = '';
+
+  html += '<div class="card">';
+  html += '<h2>Quiz Complete</h2>';
+  html += '<p>You scored <b>' + score + '</b> out of <b>' + activeLesson.quiz.length + '</b>.</p>';
+  html += '<div class="section button-row">';
+  html += '<button class="primary" onclick="showSummary()">View Summary</button>';
+  html += '<button class="secondary" onclick="showOverview()">Back to Lesson</button>';
+  html += '</div>';
+  html += '</div>';
+
+  quiz.innerHTML = html;
 }
 
 function showSummary() {
   hideAll();
   summary.classList.remove("hidden");
 
-  summary.innerHTML = `
-    <div class="card">
-      <h2>What You Should Know Now</h2>
-      <div class="summary-list">
-        ${activeLesson.summary.map(item => `<p>${item}</p>`).join("")}
-      </div>
-      <div class="section button-row">
-        <button class="secondary" onclick="showOverview()">Back to Lesson</button>
-      </div>
-    </div>
-  `;
+  let html = '';
+  html += '<div class="card">';
+  html += '<h2>What You Should Know Now</h2>';
+  html += '<div class="summary-list">';
+
+  activeLesson.summary.forEach(function(item) {
+    html += '<p>' + item + '</p>';
+  });
+
+  html += '</div>';
+  html += '<div class="section button-row">';
+  html += '<button class="secondary" onclick="showOverview()">Back to Lesson</button>';
+  html += '</div>';
+  html += '</div>';
+
+  summary.innerHTML = html;
 }
 
 function toggle(id) {
