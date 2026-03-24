@@ -1,4 +1,4 @@
-// TOGAF TOOL v1.2.0
+// TOGAF TOOL v1.2.1
 // app.js
 
 const home = document.getElementById("home");
@@ -306,7 +306,7 @@ function renderCard() {
 
   html += '<div class="section button-row">';
   html += '<button class="secondary" onclick="showOverview()">Back</button>';
-  html += '<button class="secondary" onclick="prevCard()" ' + (currentCard === 0 ? "disabled" : "") + ">Previous</button>';
+  html += '<button class="secondary" onclick="prevCard()" ' + (currentCard === 0 ? "disabled" : "") + '>Previous</button>';
   html += '<button class="primary" onclick="nextCard()">' + (currentCard === activeLesson.cards.length - 1 ? "Start Quiz" : "Next") + "</button>";
   html += "</div>";
 
