@@ -1,5 +1,5 @@
-// TOGAF TOOL v1.1.0
-// app.js (with progress tracking)
+// TOGAF TOOL v1.2.0
+// app.js
 
 const home = document.getElementById("home");
 const overview = document.getElementById("overview");
@@ -12,7 +12,6 @@ let currentCard = 0;
 let qIndex = 0;
 let score = 0;
 
-// REGISTER LESSONS
 const lessons = [
   lesson1,
   lesson2,
@@ -26,7 +25,6 @@ const lessons = [
   lesson10
 ];
 
-// PROGRESS STORAGE
 let progress = JSON.parse(localStorage.getItem("togafProgress")) || {};
 
 function saveProgress() {
@@ -40,12 +38,12 @@ function ensureLessonProgress() {
     progress[activeLesson.title] = {
       viewed: false,
       cardsViewed: [],
-      quizScore: null
+      quizScore: null,
+      lastCardIndex: 0
     };
   }
 }
 
-// NAVIGATION
 function hideAll() {
   home.classList.add("hidden");
   overview.classList.add("hidden");
@@ -54,18 +52,22 @@ function hideAll() {
   summary.classList.add("hidden");
 }
 
-// HOME SCREEN
 function showHome() {
   hideAll();
   home.classList.remove("hidden");
 
-  let html = "<h2>TOGAF Lessons</h2>";
+  let html = "";
+  html += '<div class="card">';
+  html += "<h2>TOGAF Lesson Tool</h2>";
+  html += "<p>Select a lesson to begin or continue where you left off.</p>";
+  html += "</div>";
 
   lessons.forEach(function(lessonObj, i) {
     const p = progress[lessonObj.title] || {
       viewed: false,
       cardsViewed: [],
-      quizScore: null
+      quizScore: null,
+      lastCardIndex: 0
     };
 
     const viewedCount = p.cardsViewed.length;
@@ -79,22 +81,26 @@ function showHome() {
       ? "Quiz: " + p.quizScore + "/" + lessonObj.quiz.length
       : "Quiz not done";
 
-    html += `
-      <div class="card">
-        <h3>${lessonObj.title}</h3>
-        <p>${lessonObj.description}</p>
-        <p><strong>Status:</strong> ${status}</p>
-        <p>Cards: ${viewedCount}/${totalCards}</p>
-        <p>${scoreText}</p>
-        <button class="primary" onclick="selectLesson(${i})">Open Lesson</button>
-      </div>
-    `;
+    html += '<div class="card">';
+    html += "<h3>" + lessonObj.title + "</h3>";
+    html += "<p>" + lessonObj.description + "</p>";
+    html += '<p class="meta"><strong>Status:</strong> ' + status + "</p>";
+    html += '<p class="meta">Cards viewed: ' + viewedCount + "/" + totalCards + "</p>";
+    html += '<p class="meta">' + scoreText + "</p>";
+    html += '<div class="button-row">';
+    html += '<button class="primary" onclick="selectLesson(' + i + ')">Open Lesson</button>';
+
+    if (viewedCount > 0 && viewedCount < totalCards) {
+      html += '<button class="secondary" onclick="continueLesson(' + i + ')">Continue</button>';
+    }
+
+    html += "</div>";
+    html += "</div>";
   });
 
   home.innerHTML = html;
 }
 
-// SELECT LESSON
 function selectLesson(index) {
   activeLesson = lessons[index];
   currentCard = 0;
@@ -108,121 +114,178 @@ function selectLesson(index) {
   showOverview();
 }
 
-// OVERVIEW
-function showOverview() {
-  hideAll();
-  overview.classList.remove("hidden");
-
-  let html = `<h2>${activeLesson.title}</h2>`;
-  html += "<h3>Cards</h3>";
-
-  activeLesson.cards.forEach((card, i) => {
-    html += `<div class="card">
-      <h4>${card.title}</h4>
-      <p>${card.summary}</p>
-      <button onclick="openCard(${i})">Open</button>
-    </div>`;
-  });
-
-  html += `<button class="primary" onclick="startQuiz()">Start Quiz</button>`;
-  html += `<button onclick="showHome()">Back</button>`;
-
-  overview.innerHTML = html;
-}
-
-// OPEN CARD
-function openCard(index) {
-  currentCard = index;
+function continueLesson(index) {
+  activeLesson = lessons[index];
+  qIndex = 0;
+  score = 0;
 
   ensureLessonProgress();
-  if (!progress[activeLesson.title].cardsViewed.includes(index)) {
-    progress[activeLesson.title].cardsViewed.push(index);
-    saveProgress();
-  }
+  currentCard = progress[activeLesson.title].lastCardIndex || 0;
 
   hideAll();
   lesson.classList.remove("hidden");
   renderCard();
 }
 
-// RENDER CARD
-function renderCard() {
-  const card = activeLesson.cards[currentCard];
+function showOverview() {
+  if (!activeLesson) {
+    showHome();
+    return;
+  }
+
+  hideAll();
+  overview.classList.remove("hidden");
 
   let html = "";
   html += '<div class="card">';
-  html += '<div class="meta">Card ' + (currentCard + 1) + ' of ' + activeLesson.cards.length + '</div>';
+  html += "<h2>" + activeLesson.title + "</h2>";
+  html += "<p>" + activeLesson.description + "</p>";
+  html += "</div>";
 
-  html += '<h2>' + card.title + '</h2>';
-  html += '<p><b>' + (card.summary || '') + '</b></p>';
+  html += "<h3>Lesson Cards</h3>";
+
+  activeLesson.cards.forEach(function(card, i) {
+    const p = progress[activeLesson.title] || { cardsViewed: [] };
+    const viewed = p.cardsViewed.includes(i);
+
+    html += '<div class="card">';
+    html += '<h4 class="preview-title">' + card.title + "</h4>";
+    html += '<p class="preview-summary">' + (card.summary || "") + "</p>";
+    html += '<p class="meta">' + (viewed ? "Viewed" : "Not viewed") + "</p>";
+    html += '<div class="button-row">';
+    html += '<button class="primary" onclick="openCard(' + i + ')">Open</button>';
+    html += "</div>";
+    html += "</div>";
+  });
+
+  html += '<div class="card">';
+  html += '<div class="button-row">';
+  html += '<button class="secondary" onclick="showHome()">Back Home</button>';
+  html += '<button class="primary" onclick="startQuiz()">Quiz</button>';
+  html += '<button class="secondary" onclick="showSummary()">Summary</button>';
+  html += "</div>";
+  html += "</div>";
+
+  overview.innerHTML = html;
+}
+
+function openCard(index) {
+  currentCard = index;
+
+  ensureLessonProgress();
+
+  if (!progress[activeLesson.title].cardsViewed.includes(index)) {
+    progress[activeLesson.title].cardsViewed.push(index);
+  }
+
+  progress[activeLesson.title].lastCardIndex = index;
+  saveProgress();
+
+  hideAll();
+  lesson.classList.remove("hidden");
+  renderCard();
+}
+
+function prevCard() {
+  if (currentCard > 0) {
+    currentCard--;
+    progress[activeLesson.title].lastCardIndex = currentCard;
+    saveProgress();
+    renderCard();
+  }
+}
+
+function nextCard() {
+  if (currentCard < activeLesson.cards.length - 1) {
+    currentCard++;
+    if (!progress[activeLesson.title].cardsViewed.includes(currentCard)) {
+      progress[activeLesson.title].cardsViewed.push(currentCard);
+    }
+    progress[activeLesson.title].lastCardIndex = currentCard;
+    saveProgress();
+    renderCard();
+  } else {
+    startQuiz();
+  }
+}
+
+function renderCard() {
+  const card = activeLesson.cards[currentCard];
+  let html = "";
+
+  html += '<div class="card">';
+  html += '<div class="meta">Card ' + (currentCard + 1) + " of " + activeLesson.cards.length + "</div>";
+
+  html += "<h2>" + card.title + "</h2>";
+  html += "<p><b>" + (card.summary || "") + "</b></p>";
 
   html += '<div class="section">';
-  html += '<h3>Concept</h3>';
-  html += '<p>' + (card.concept || '') + '</p>';
-  html += '</div>';
+  html += "<h3>Concept</h3>";
+  html += "<p>" + (card.concept || "") + "</p>";
+  html += "</div>";
 
   html += '<div class="section">';
-  html += '<h3>Why it matters</h3>';
-  html += '<p>' + (card.why || '') + '</p>';
-  html += '</div>';
+  html += "<h3>Why it matters</h3>";
+  html += "<p>" + (card.why || "") + "</p>";
+  html += "</div>";
 
   html += '<div class="section box">';
-  html += '<h3>Analogy</h3>';
-  html += '<p>' + (card.analogy || '') + '</p>';
-  html += '</div>';
+  html += "<h3>Analogy</h3>";
+  html += "<p>" + (card.analogy || "") + "</p>";
+  html += "</div>";
 
   if (card.textbook) {
     html += '<div class="section">';
     html += '<button class="secondary" onclick="toggle(\'textbook\')">Read Textbook Explanation</button>';
     html += '<div id="textbook" class="hidden">';
     html += '<div class="card" style="margin-top:12px; background:#fafafa;">';
-    html += '<p>' + (card.textbook.intro || '') + '</p>';
+    html += "<p>" + (card.textbook.intro || "") + "</p>";
 
     if (card.textbook.sections && card.textbook.sections.length) {
       card.textbook.sections.forEach(function(section) {
         html += '<div class="section">';
-        html += '<h3>' + section.heading + '</h3>';
-        html += '<p>' + section.body + '</p>';
-        html += '</div>';
+        html += "<h3>" + section.heading + "</h3>";
+        html += "<p>" + section.body + "</p>";
+        html += "</div>";
       });
     }
 
-    html += '</div>';
-    html += '</div>';
-    html += '</div>';
+    html += "</div>";
+    html += "</div>";
+    html += "</div>";
   }
 
   if (card.references && card.references.length) {
     html += '<div class="section">';
-    html += '<h3>References</h3>';
+    html += "<h3>References</h3>";
     html += '<div class="button-row">';
 
     card.references.forEach(function(ref) {
       html += '<a href="' + ref.url + '" target="_blank" rel="noopener noreferrer">';
-      html += '<button class="secondary" type="button">' + ref.label + '</button>';
-      html += '</a>';
+      html += '<button class="secondary" type="button">' + ref.label + "</button>";
+      html += "</a>";
     });
 
-    html += '</div>';
-    html += '</div>';
+    html += "</div>";
+    html += "</div>";
   }
 
   if (card.detail) {
     html += '<div class="section">';
     html += '<button class="secondary" onclick="toggle(\'detail\')">Show Detailed Explanation</button>';
     html += '<div id="detail" class="hidden">';
-    html += '<p>' + card.detail + '</p>';
-    html += '</div>';
-    html += '</div>';
+    html += "<p>" + card.detail + "</p>";
+    html += "</div>";
+    html += "</div>";
   }
 
   if (card.example) {
     html += '<div class="section">';
     html += '<button class="secondary" onclick="toggle(\'example\')">Show Example</button>';
     html += '<div id="example" class="hidden">';
-    html += '<p>' + card.example + '</p>';
-    html += '</div>';
-    html += '</div>';
+    html += "<p>" + card.example + "</p>";
+    html += "</div>";
+    html += "</div>";
   }
 
   if (card.exam && card.exam.length) {
@@ -230,82 +293,141 @@ function renderCard() {
     html += '<button class="secondary" onclick="toggle(\'exam\')">Show Exam Notes</button>';
     html += '<div id="exam" class="hidden">';
     card.exam.forEach(function(note) {
-      html += '<p>' + note + '</p>';
+      html += "<p>" + note + "</p>";
     });
-    html += '</div>';
-    html += '</div>';
+    html += "</div>";
+    html += "</div>";
   }
 
   html += '<div class="section takeaway">';
-  html += '<h3>Key Takeaway</h3>';
-  html += '<p>' + (card.takeaway || '') + '</p>';
-  html += '</div>';
+  html += "<h3>Key Takeaway</h3>";
+  html += "<p>" + (card.takeaway || "") + "</p>";
+  html += "</div>";
 
   html += '<div class="section button-row">';
   html += '<button class="secondary" onclick="showOverview()">Back</button>';
-  html += '<button class="secondary" onclick="prevCard()" ' + (currentCard === 0 ? 'disabled' : '') + '>Previous</button>';
-  html += '<button class="primary" onclick="nextCard()">' + (currentCard === activeLesson.cards.length - 1 ? 'Start Quiz' : 'Next') + '</button>';
-  html += '</div>';
+  html += '<button class="secondary" onclick="prevCard()" ' + (currentCard === 0 ? "disabled" : "") + ">Previous</button>';
+  html += '<button class="primary" onclick="nextCard()">' + (currentCard === activeLesson.cards.length - 1 ? "Start Quiz" : "Next") + "</button>";
+  html += "</div>";
 
-  html += '</div>';
+  html += "</div>";
 
   lesson.innerHTML = html;
 }
-}
 
-// QUIZ
 function startQuiz() {
+  if (!activeLesson) {
+    showHome();
+    return;
+  }
+
   qIndex = 0;
   score = 0;
   hideAll();
   quiz.classList.remove("hidden");
-  showQuestion();
+  renderQuizQuestion();
 }
 
-function showQuestion() {
+function renderQuizQuestion() {
   const q = activeLesson.quiz[qIndex];
+  let html = "";
 
-  let html = `<h3>${q.q}</h3>`;
+  html += '<div class="card">';
+  html += '<div class="meta">Question ' + (qIndex + 1) + " of " + activeLesson.quiz.length + "</div>";
+  html += "<h2>" + q.q + "</h2>";
+  html += '<div class="answer-list">';
 
-  q.a.forEach((option, i) => {
-    html += `<button onclick="answer(${i})">${option}</button><br>`;
+  q.a.forEach(function(option, i) {
+    html += '<button class="secondary" onclick="answerQuestion(' + i + ')">' + option + "</button>";
   });
+
+  html += "</div>";
+  html += '<div class="section button-row">';
+  html += '<button class="secondary" onclick="showOverview()">Back to Lesson</button>';
+  html += "</div>";
+  html += "</div>";
 
   quiz.innerHTML = html;
 }
 
-function answer(i) {
-  if (i === activeLesson.quiz[qIndex].c) score++;
+function answerQuestion(index) {
+  const q = activeLesson.quiz[qIndex];
+
+  if (index === q.c) {
+    score++;
+  }
+
   qIndex++;
 
   if (qIndex < activeLesson.quiz.length) {
-    showQuestion();
+    renderQuizQuestion();
   } else {
     showQuizResults();
   }
 }
 
-// QUIZ RESULTS
 function showQuizResults() {
   ensureLessonProgress();
   progress[activeLesson.title].quizScore = score;
   saveProgress();
 
+  let html = "";
+
   hideAll();
   summary.classList.remove("hidden");
 
-  let html = `<h2>Score: ${score}/${activeLesson.quiz.length}</h2>`;
+  html += '<div class="card">';
+  html += "<h2>Quiz Complete</h2>";
+  html += "<p>You scored <b>" + score + "</b> out of <b>" + activeLesson.quiz.length + "</b>.</p>";
+  html += '<div class="summary-list">';
 
-  html += "<ul>";
-  activeLesson.summary.forEach(item => {
-    html += `<li>${item}</li>`;
+  activeLesson.summary.forEach(function(item) {
+    html += "<p>" + item + "</p>";
   });
-  html += "</ul>";
 
-  html += `<button onclick="showHome()">Home</button>`;
+  html += "</div>";
+  html += '<div class="section button-row">';
+  html += '<button class="primary" onclick="showOverview()">Back to Lesson</button>';
+  html += '<button class="secondary" onclick="showHome()">Home</button>';
+  html += "</div>";
+  html += "</div>";
 
   summary.innerHTML = html;
 }
 
-// INIT
+function showSummary() {
+  if (!activeLesson) {
+    showHome();
+    return;
+  }
+
+  hideAll();
+  summary.classList.remove("hidden");
+
+  let html = "";
+  html += '<div class="card">';
+  html += "<h2>What You Should Know Now</h2>";
+  html += '<div class="summary-list">';
+
+  activeLesson.summary.forEach(function(item) {
+    html += "<p>" + item + "</p>";
+  });
+
+  html += "</div>";
+  html += '<div class="section button-row">';
+  html += '<button class="secondary" onclick="showOverview()">Back to Lesson</button>';
+  html += '<button class="secondary" onclick="showHome()">Home</button>';
+  html += "</div>";
+  html += "</div>";
+
+  summary.innerHTML = html;
+}
+
+function toggle(id) {
+  const el = document.getElementById(id);
+  if (el) {
+    el.classList.toggle("hidden");
+  }
+}
+
 showHome();
