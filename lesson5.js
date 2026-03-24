@@ -1,1 +1,1 @@
-
+const lesson5 = {}
