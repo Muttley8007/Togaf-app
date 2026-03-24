@@ -1,7 +1,7 @@
 // TOGAF TOOL v0.8.4
 // app.js
 
-const activeLesson = lesson1;
+const lessons = [lesson1, lesson2];
 
 let currentCard = 0;
 let qIndex = 0;
