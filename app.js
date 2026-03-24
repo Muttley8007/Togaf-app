@@ -149,18 +149,108 @@ function openCard(index) {
 function renderCard() {
   const card = activeLesson.cards[currentCard];
 
-  let html = `<h2>${card.title}</h2>
-    <p><strong>Concept:</strong> ${card.concept}</p>
-    <p><strong>Why:</strong> ${card.why}</p>
-    <p><strong>Analogy:</strong> ${card.analogy}</p>
-    <p><strong>Detail:</strong> ${card.detail}</p>
-    <p><strong>Example:</strong> ${card.example}</p>
-    <p><strong>Takeaway:</strong> ${card.takeaway}</p>
-  `;
+  let html = "";
+  html += '<div class="card">';
+  html += '<div class="meta">Card ' + (currentCard + 1) + ' of ' + activeLesson.cards.length + '</div>';
 
-  html += `<button onclick="showOverview()">Back</button>`;
+  html += '<h2>' + card.title + '</h2>';
+  html += '<p><b>' + (card.summary || '') + '</b></p>';
+
+  html += '<div class="section">';
+  html += '<h3>Concept</h3>';
+  html += '<p>' + (card.concept || '') + '</p>';
+  html += '</div>';
+
+  html += '<div class="section">';
+  html += '<h3>Why it matters</h3>';
+  html += '<p>' + (card.why || '') + '</p>';
+  html += '</div>';
+
+  html += '<div class="section box">';
+  html += '<h3>Analogy</h3>';
+  html += '<p>' + (card.analogy || '') + '</p>';
+  html += '</div>';
+
+  if (card.textbook) {
+    html += '<div class="section">';
+    html += '<button class="secondary" onclick="toggle(\'textbook\')">Read Textbook Explanation</button>';
+    html += '<div id="textbook" class="hidden">';
+    html += '<div class="card" style="margin-top:12px; background:#fafafa;">';
+    html += '<p>' + (card.textbook.intro || '') + '</p>';
+
+    if (card.textbook.sections && card.textbook.sections.length) {
+      card.textbook.sections.forEach(function(section) {
+        html += '<div class="section">';
+        html += '<h3>' + section.heading + '</h3>';
+        html += '<p>' + section.body + '</p>';
+        html += '</div>';
+      });
+    }
+
+    html += '</div>';
+    html += '</div>';
+    html += '</div>';
+  }
+
+  if (card.references && card.references.length) {
+    html += '<div class="section">';
+    html += '<h3>References</h3>';
+    html += '<div class="button-row">';
+
+    card.references.forEach(function(ref) {
+      html += '<a href="' + ref.url + '" target="_blank" rel="noopener noreferrer">';
+      html += '<button class="secondary" type="button">' + ref.label + '</button>';
+      html += '</a>';
+    });
+
+    html += '</div>';
+    html += '</div>';
+  }
+
+  if (card.detail) {
+    html += '<div class="section">';
+    html += '<button class="secondary" onclick="toggle(\'detail\')">Show Detailed Explanation</button>';
+    html += '<div id="detail" class="hidden">';
+    html += '<p>' + card.detail + '</p>';
+    html += '</div>';
+    html += '</div>';
+  }
+
+  if (card.example) {
+    html += '<div class="section">';
+    html += '<button class="secondary" onclick="toggle(\'example\')">Show Example</button>';
+    html += '<div id="example" class="hidden">';
+    html += '<p>' + card.example + '</p>';
+    html += '</div>';
+    html += '</div>';
+  }
+
+  if (card.exam && card.exam.length) {
+    html += '<div class="section">';
+    html += '<button class="secondary" onclick="toggle(\'exam\')">Show Exam Notes</button>';
+    html += '<div id="exam" class="hidden">';
+    card.exam.forEach(function(note) {
+      html += '<p>' + note + '</p>';
+    });
+    html += '</div>';
+    html += '</div>';
+  }
+
+  html += '<div class="section takeaway">';
+  html += '<h3>Key Takeaway</h3>';
+  html += '<p>' + (card.takeaway || '') + '</p>';
+  html += '</div>';
+
+  html += '<div class="section button-row">';
+  html += '<button class="secondary" onclick="showOverview()">Back</button>';
+  html += '<button class="secondary" onclick="prevCard()" ' + (currentCard === 0 ? 'disabled' : '') + '>Previous</button>';
+  html += '<button class="primary" onclick="nextCard()">' + (currentCard === activeLesson.cards.length - 1 ? 'Start Quiz' : 'Next') + '</button>';
+  html += '</div>';
+
+  html += '</div>';
 
   lesson.innerHTML = html;
+}
 }
 
 // QUIZ
