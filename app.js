@@ -7,6 +7,7 @@ let activeLesson = null;
 let currentCard = 0;
 let qIndex = 0;
 let score = 0;
+let progress = JSON.parse(localStorage.getItem("togafProgress")) || {};
 
 const home = document.getElementById("home");
 const overview = document.getElementById("overview");
