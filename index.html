@@ -3,8 +3,65 @@
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TOGAF Tool</title>
-  <link rel="stylesheet" href="style.css">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 16px;
+      background: #f4f4f4;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+    }
+
+    .card {
+      background: white;
+      padding: 16px;
+      margin-bottom: 12px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    button {
+      padding: 10px 14px;
+      margin: 4px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: #007bff;
+      color: white;
+    }
+
+    .secondary {
+      background: #ddd;
+    }
+
+    .button-row {
+      margin-top: 10px;
+    }
+
+    .section {
+      margin-top: 12px;
+    }
+
+    .box {
+      background: #f9f9f9;
+      padding: 10px;
+      border-radius: 6px;
+    }
+  </style>
 </head>
+
 <body>
 
 <div class="container">
@@ -15,6 +72,7 @@
   <div id="summary" class="hidden"></div>
 </div>
 
+<!-- ORDER MATTERS -->
 <script src="lesson1.js"></script>
 <script src="lesson2.js"></script>
 <script src="app.js"></script>
