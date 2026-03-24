@@ -127,13 +127,20 @@ function renderCard() {
     html += '</div>';
   }
 
-  if (card.reference) {
-    html += '<div class="section">';
-    html += '<a href="' + card.reference.url + '" target="_blank" rel="noopener noreferrer">';
-    html += '<button class="secondary">' + card.reference.label + '</button>';
+  if (card.references && card.references.length) {
+  html += '<div class="section">';
+  html += '<h3>References</h3>';
+  html += '<div class="button-row">';
+
+  card.references.forEach(function(ref) {
+    html += '<a href="' + ref.url + '" target="_blank" rel="noopener noreferrer">';
+    html += '<button class="secondary">' + ref.label + '</button>';
     html += '</a>';
-    html += '</div>';
-  }
+  });
+
+  html += '</div>';
+  html += '</div>';
+}
 
   if (card.detail) {
     html += '<div class="section">';
