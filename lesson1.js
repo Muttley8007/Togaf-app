@@ -32,10 +32,20 @@ const lesson1 = {
         ]
       },
 
-      reference: {
-        label: "Open Group TOGAF Standard overview",
-        url: "https://www.opengroup.org/togaf"
-      },
+     references: [
+  {
+    label: "TOGAF Standard Overview",
+    url: "https://www.opengroup.org/togaf"
+  },
+  {
+    label: "TOGAF Standard (10th Edition) - Official",
+    url: "https://publications.opengroup.org/togaf-standard"
+  },
+  {
+    label: "Architecture Development Method (ADM)",
+    url: "https://www.opengroup.org/togaf/adm"
+  }
+]
 
       detail: "TOGAF provides a method, a common vocabulary, and a way to think about architecture as an enterprise capability rather than just a one-off design exercise.",
       example: "If an organisation wants to modernise customer service, TOGAF helps make sure business goals, customer data, applications, and infrastructure are considered together instead of each team making separate decisions.",
