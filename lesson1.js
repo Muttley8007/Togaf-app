@@ -1,4 +1,9 @@
-{
+const lesson1 = {
+  title: "Lesson 1 - TOGAF Foundations",
+  description: "Understand TOGAF, enterprise architecture, domains, ADM and requirements.",
+
+  cards: [
+    {
   title: "What is TOGAF?",
   summary: "A framework for guiding enterprise architecture decisions.",
   concept: "TOGAF is a structured framework used to design, plan, implement, and govern enterprise architecture. It helps organisations align business goals with data, applications, and technology so change is coordinated rather than fragmented.",
